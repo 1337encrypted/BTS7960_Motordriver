@@ -46,10 +46,10 @@ BTS7960::BTS7960()
     //Motor driver 1 pin definitions
     this->L_EN = 2;
     this->L_EN = 4;
-    this->L_PWM = 3;
-    this->R_PWM = 5;
-    //this->L_IS1 = L_IS1   //Alarm pin
-    //this->R_IS1 = R_IS1   //Alarm pin
+    this->L_PWM = 5;        //pin 5 has PWM frequency of 980Hz
+    this->R_PWM = 6;        //pin 5 has PWM frequency of 980Hz
+    //this->L_IS1 = L_IS1      //Alarm pin
+    //this->R_IS1 = R_IS1      //Alarm pin
 
     //Set the global pwm variable to 255
     this->pwm = 255;
@@ -63,8 +63,8 @@ BTS7960::BTS7960(byte L_EN, byte R_EN, byte L_PWM, byte R_PWM)
     this->L_EN = R_EN;
     this->L_PWM = L_PWM;
     this->R_PWM = R_PWM;
-    //this->L_IS1 = L_IS1   //Alarm pin
-    //this->R_IS1 = R_IS1   //Alarm pin
+    //this->L_IS1 = L_IS1      //Alarm pin
+    //this->R_IS1 = R_IS1      //Alarm pin
 
     //Set the global pwm variable to 255
     this->pwm = 255;
