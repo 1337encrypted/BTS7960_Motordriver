@@ -1,0 +1,13 @@
+# Datatypes (KEYWORD1)
+BTS7960	KEYWORD1
+
+# Methods and Functions (KEYWORD2)
+begin	KEYWORD2
+enable	KEYWORD2
+disable	KEYWORD2
+stop	KEYWORD2
+front	KEYWORD2
+back	KEYWORD2
+
+# Constants (LITERAL1)
+pwm	LITERAL1
