@@ -36,6 +36,7 @@ class BTS7960
     volatile uint8_t pwm;
 /*================================================Functin prototyping section========================================================*/
     inline BTS7960() __attribute__((always_inline));
+    inline ~BTS7960() __attribute__((always_inline));
     inline BTS7960(uint8_t, uint8_t) __attribute__((always_inline));
     inline BTS7960(uint8_t, uint8_t, uint8_t, uint8_t) __attribute__((always_inline));
     inline BTS7960(uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t) __attribute__((always_inline));
@@ -45,11 +46,10 @@ class BTS7960
     inline void stop() __attribute__((always_inline));
     inline void front() __attribute__((always_inline));
     inline void back() __attribute__((always_inline));
-    inline ~BTS7960() __attribute__((always_inline));
 /*===================================================================================================================================*/
 };
 
-//Default ructor
+//Default constructor
 BTS7960::BTS7960()
 {
     //Motor driver 1 pin definitions
@@ -64,7 +64,13 @@ BTS7960::BTS7960()
     this->pwm = 255;
 }
 
-//Parametrised ructor with 6 parameters
+//Destructor
+BTS7960::~BTS7960()
+{
+  Serial.println("motor object destroyed");
+}
+
+//Parametrised constructor with 6 parameters
 BTS7960::BTS7960(uint8_t L_EN, uint8_t R_EN, uint8_t L_PWM, uint8_t R_PWM, uint8_t L_IS, uint8_t R_IS)
 {
     //Motor driver 1 pin definitions
@@ -101,12 +107,6 @@ BTS7960::BTS7960(uint8_t L_PWM, uint8_t R_PWM)
 
     //Set the global pwm variable to 255
     this->pwm = 255;
-}
-
-//Destructor
-BTS7960::~BTS7960()
-{
-  Serial.println("motor object destroyed");
 }
 
 void BTS7960::begin()

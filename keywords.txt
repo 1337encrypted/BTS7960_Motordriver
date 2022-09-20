@@ -1,7 +1,8 @@
 # Datatypes (KEYWORD1)
-BTS7960	KEYWORD1
+BTS7960		KEYWORD1
 
 # Methods and Functions (KEYWORD2)
+BTS7960	KEYWORD2
 begin	KEYWORD2
 enable	KEYWORD2
 disable	KEYWORD2
