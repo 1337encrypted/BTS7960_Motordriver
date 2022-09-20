@@ -1,5 +1,5 @@
 # Datatypes (KEYWORD1)
-BTS7960		KEYWORD1
+BTS7960_Motordriver		KEYWORD1
 
 # Methods and Functions (KEYWORD2)
 BTS7960	KEYWORD2
