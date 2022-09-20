@@ -1,13 +1,10 @@
 #include <BTS7960.h>
-
+//BTS7960 works between +3v and +5v so you can use a uno, mega or a nano.
 #define L_EN 2
 #define R_EN 4
 #define L_PWM 5                             //pin 5 supports 980hz pwm frequency
 #define R_PWM 6                             //pin 6 supports 980hz pwm frequency
-//#define L_IS 7
-//#define R_IS 8
 
-//Parametrized constructor
 BTS7960 motor1(L_EN, R_EN, L_PWM, R_PWM);   //This method will create a object of the class BTS7960
 
 void setup() {
