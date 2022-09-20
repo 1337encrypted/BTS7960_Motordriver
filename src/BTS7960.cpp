@@ -1,4 +1,4 @@
-#include "BTS7960.h"
+#include "BTS7960_Motordriver.h"
 //Default constructor
 BTS7960::BTS7960()
 {
