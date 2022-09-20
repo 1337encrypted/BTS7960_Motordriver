@@ -14,3 +14,4 @@
 <li>front()</li>
 <li>back()</li>
 </ul>
+<p>Checkout examples on how to use the library</p>
