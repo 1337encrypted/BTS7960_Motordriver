@@ -7,10 +7,10 @@
 <li>BTS7960(uint8_t, uint8_t)</li>
 <li>BTS7960(uint8_t, uint8_t, uint8_t, uint8_t)</li>
 <li>BTS7960(uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t)</li> 
-<li>void begin()</li> 
-<li>void enable()</li> 
-<li>void disable()</li>
-<li>void stop()</li>
-<li>void front()</li>
-<li>void back()</li>
+<li>begin()</li> 
+<li>enable()</li> 
+<li>disable()</li>
+<li>stop()</li>
+<li>front()</li>
+<li>back()</li>
 </ul>
