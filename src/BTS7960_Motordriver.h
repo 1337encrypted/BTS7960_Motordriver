@@ -21,20 +21,21 @@
 
 class BTS7960
 {
-    private:
-
+    protected:
     //L_IS1,R_IS1 are not included
     uint8_t R_EN;
     uint8_t L_EN;
     uint8_t R_PWM;
     uint8_t L_PWM;
-//    uint8_t R_IS;
-//    uint8_t L_IS;
-    
+    //uint8_t R_IS;
+    //uint8_t L_IS;
+        
     public:
+    
     //pwm variable to control the speed of motor
     volatile uint8_t pwm;
-/*================================================Functin prototyping section========================================================*/
+    
+    /*================================================Function prototyping section========================================================*/
     BTS7960();
      ~BTS7960();
      BTS7960(uint8_t, uint8_t);
@@ -46,6 +47,6 @@ class BTS7960
      void stop();
      void front();
      void back();
-/*===================================================================================================================================*/
+    /*====================================================================================================================================*/
 };
 #endif  //END BTS7960_H
