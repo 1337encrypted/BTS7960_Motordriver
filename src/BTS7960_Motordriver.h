@@ -21,7 +21,7 @@
 
 class BTS7960
 {
-    protected:
+    private:
     //L_IS1,R_IS1 are not included
     uint8_t R_EN;
     uint8_t L_EN;
@@ -36,17 +36,17 @@ class BTS7960
     volatile uint8_t pwm;
     
     /*================================================Function prototyping section========================================================*/
-    BTS7960();
-     ~BTS7960();
-     BTS7960(uint8_t, uint8_t);
-     BTS7960(uint8_t, uint8_t, uint8_t, uint8_t);
-     BTS7960(uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t);
-     void begin();
-     void enable();
-     void disable();
-     void stop();
-     void front();
-     void back();
+    BTS7960();                                                      // L_EN=2, R_EN=4, L_PWM=5, R_PWM=6, L_IS=disabled, R_IS=disabled;
+    BTS7960(uint8_t, uint8_t);                                      // L_PWM, R_PWM
+    BTS7960(uint8_t, uint8_t, uint8_t, uint8_t);                    // L_EN, R_EN, L_PWM, R_PWM
+    BTS7960(uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t);  // L_EN, R_EN, L_PWM, R_PWM, L_IS, R_IS
+    void begin();
+    void enable();
+    void disable();
+    void stop();
+    void front();
+    void back();
+    ~BTS7960();
     /*====================================================================================================================================*/
 };
 #endif  //END BTS7960_H

@@ -2,40 +2,30 @@
 //Default constructor
 BTS7960::BTS7960()
 {
-    //Motor driver 1 pin definitions
+    //Motor driver 1 pin definitions.
     this->L_EN = 2;
     this->R_EN = 4;
     this->L_PWM = 5;        //pin 5 has PWM frequency of 980Hz
     this->R_PWM = 6;        //pin 6 has PWM frequency of 980Hz
-//    this->L_IS = L_IS;      //Alarm pin
-//    this->R_IS = R_IS;      //Alarm pin
+//    this->L_IS = 7;         //Alarm pin
+//    this->R_IS = 8;         //Alarm pin
 
     //Set the global pwm variable to 255
     this->pwm = 255;
 }
 
-//Destructor
-BTS7960::~BTS7960()
-{
-  Serial.println("motor object destroyed");
-}
-
-//Parametrised constructor with 6 parameters
-BTS7960::BTS7960(uint8_t L_EN, uint8_t R_EN, uint8_t L_PWM, uint8_t R_PWM, uint8_t L_IS, uint8_t R_IS)
+//Parametrised constructor with 2 parameters where R_EN and L_EN are hard wired to 3.3v to 5v.
+BTS7960::BTS7960(uint8_t L_PWM, uint8_t R_PWM)
 {
     //Motor driver 1 pin definitions
-    this->L_EN = L_EN;
-    this->R_EN = R_EN;
     this->L_PWM = L_PWM;    //pin 5 has PWM frequency of 980Hz
     this->R_PWM = R_PWM;    //pin 6 has PWM frequency of 980Hz
-//    this->L_IS = L_IS;      //Alarm pin
-//    this->R_IS = R_IS;      //Alarm pin
 
     //Set the global pwm variable to 255
     this->pwm = 255;
 }
 
-//Parametrised constructor with 4 parameters
+//Parametrised constructor with 4 parameters, this disables L_IS and R_IS.
 BTS7960::BTS7960(uint8_t L_EN, uint8_t R_EN, uint8_t L_PWM, uint8_t R_PWM)
 {
     //Motor driver 1 pin definitions
@@ -48,12 +38,16 @@ BTS7960::BTS7960(uint8_t L_EN, uint8_t R_EN, uint8_t L_PWM, uint8_t R_PWM)
     this->pwm = 255;
 }
 
-//Parametrised constructor with 2 parameters
-BTS7960::BTS7960(uint8_t L_PWM, uint8_t R_PWM)
+//Parametrised constructor with 6 parameters (still need to work on it, avoid it for right now)
+BTS7960::BTS7960(uint8_t L_EN, uint8_t R_EN, uint8_t L_PWM, uint8_t R_PWM, uint8_t L_IS, uint8_t R_IS)
 {
     //Motor driver 1 pin definitions
+    this->L_EN = L_EN;
+    this->R_EN = R_EN;
     this->L_PWM = L_PWM;    //pin 5 has PWM frequency of 980Hz
     this->R_PWM = R_PWM;    //pin 6 has PWM frequency of 980Hz
+//    this->L_IS = L_IS;      //Alarm pin
+//    this->R_IS = R_IS;      //Alarm pin
 
     //Set the global pwm variable to 255
     this->pwm = 255;
@@ -88,10 +82,24 @@ void BTS7960::stop()
 {
     analogWrite(R_PWM,0);
     analogWrite(L_PWM,0);
+    
+    //R_EN is HIGH then set it low, else dont
+    if(digitalRead(R_EN))
+    {
+        disable();
+        debugln("disbale");
+    }
 }
 
 void BTS7960::front()
 {
+    //R_EN is LOW then set it high, else dont
+    if(!digitalRead(R_EN))
+    {
+        enable();
+        debugln("enable");
+    }
+    
     analogWrite(L_PWM,0);
     //delayMicroseconds(100);
     analogWrite(R_PWM,pwm);
@@ -100,8 +108,21 @@ void BTS7960::front()
 
 void BTS7960::back()
 {
+    //R_EN is LOW then set it high, else dont
+    if(!digitalRead(R_EN))
+    {
+        enable();
+        debugln("enable");
+    }
+    
     analogWrite(L_PWM,pwm);
     //delayMicroseconds(100);
     analogWrite(R_PWM,0);
     //delayMicroseconds(100);
+}
+
+//Destructor
+BTS7960::~BTS7960()
+{
+  debugln("motor object destroyed");
 }
