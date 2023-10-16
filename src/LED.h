@@ -13,7 +13,7 @@ class led
   private:
   //ledPin pins for function feedback
   uint8_t ledPin;
-  bool debug;
+  bool debugStatus;
   String ledId;
 
   public:
@@ -48,12 +48,13 @@ void led::begin()
 }
 
 //parametrized constructor
-led::led(const uint8_t ledPin, const String ledId, bool debug)
+led::led(const uint8_t ledPin, const String ledId, bool debugStatus)
 {
   //Initilize the ledPin pins
   this->ledPin = ledPin;
-  this->debug = debug;
+  this->debugStatus = debugStatus;
   this->ledId = ledId;
+
   //Begin and enable happens after object construction
   begin();
 }
@@ -61,18 +62,19 @@ led::led(const uint8_t ledPin, const String ledId, bool debug)
 //Destructor
 led::~led()
 {
-  if(this->debug)
-    Serial.println(this->ledId+" object destroyed");
+  if(this->debugStatus) Serial.println(this->ledId+" object destroyed");
 }
 
 void led::on()
 {
-  digitalWrite(ledPin, HIGH); 
+  digitalWrite(ledPin, HIGH);
+  if(this->debugStatus) Serial.println(this->ledId+" ON");
 }
 
 void led::off()
 {
   digitalWrite(ledPin, LOW);
+  if(this->debugStatus) Serial.println(this->ledId+" OFF");
 }
 
 void led::toggle()
@@ -100,7 +102,7 @@ void led:: blinkTwice()
 
 void led::printInfo()
 {
-	Serial.println(ledId+" object initilized");
+	if(debugStatus) Serial.println(this->ledId+" object initilized");
 	delay(1000);
 }
 

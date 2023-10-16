@@ -1,165 +1,110 @@
 #include "GLOBALS.h"
+#include "CONFIG.h"
 
 void notify()
 {
-  /* Get Y values from the joystick */
-  rightY = (Ps3.data.analog.stick.ry);
-  leftY = (Ps3.data.analog.stick.ly);
 
-  /* By default the motor status is set to stop */
-  motor1.motorStatus = motor1.motorStates::STOP;
-  motor2.motorStatus = motor2.motorStates::STOP;
-  redLed.ledStatus = redLed.ledStates::OFF;
   buzz.buzzStatus = buzz.buzzStates::OFF;
 
   /*---------------- Setting the speed ----------------
-  //--- Digital cross/square/triangle/circle button events ---*/
-  
-  if( Ps3.event.button_down.triangle ) //100%
+  /*---- Analog cross/square/triangle/circle button events ----*/
+
+  if( abs(Ps3.event.analog_changed.button.triangle) > 100)
   {
     motor1.speed = motor2.speed = 255;
   }
 
-  if( Ps3.event.button_down.circle )
+  if( abs(Ps3.event.analog_changed.button.circle) > 100)
   {
     motor1.speed = motor2.speed = 205;
   }
-      
-  if( Ps3.event.button_down.square )
-  {
-    motor1.speed = motor2.speed = 180;
-  }     
 
-  if( Ps3.event.button_down.cross )
+  if( abs(Ps3.event.analog_changed.button.cross) > 100)
   {
     motor1.speed = motor2.speed = 155;
   }
 
-    
-  //---------------- Analog stick value events ---------------
-  
-  if(rightY < DeadBandNegVal)
+  if( abs(Ps3.event.analog_changed.button.square) > 100)
   {
-    motor1.speed = (uint8_t) ceil(rightY*uSpeed);
-    motor1.motorStatus = motor1.motorStates::FRONT;
-    redLed.ledStatus = redLed.ledStates::ON;
-  }
-  else if(rightY > DeadBandPosVal)
-  {
-    motor1.speed = (uint8_t) ceil(rightY*dSpeed);
-    motor1.motorStatus = motor1.motorStates::BACK;
-    redLed.ledStatus = redLed.ledStates::ON;
+    motor1.speed = motor2.speed = 180;
   }
 
-  if(leftY < DeadBandNegVal)
-  {
-    motor2.speed =  (uint8_t) ceil(leftY*uSpeed);
-    motor2.motorStatus = motor2.motorStates::FRONT;
-    redLed.ledStatus = redLed.ledStates::ON;
-  }
-  else if(leftY > DeadBandPosVal)
-  {
-    motor2.speed = (uint8_t) ceil(leftY*dSpeed);
-    motor2.motorStatus = motor2.motorStates::BACK;
-    redLed.ledStatus = redLed.ledStates::ON;
-  }
+  /* ============================================= Motor 1 events ============================================= */
 
-  /*-------------- Digital trigger button events -------------*/
-  if( Ps3.event.button_down.l2 )
-  {
-    motor1.motorStatus = motor1.motorStates::BACK;
-    redLed.ledStatus = redLed.ledStates::ON;
-  }
-
-  if( Ps3.event.button_down.r2 )
-  {
-    motor2.motorStatus = motor2.motorStates::BACK;
-    redLed.ledStatus = redLed.ledStates::ON;
-  }
-
-  /*------------- Digital shoulder button events -------------*/
-  if( Ps3.event.button_down.l1 )
+  if( Ps3.event.button_down.l1 )        /*------------- Digital left shoulder button event -------------*/
   {
     motor1.motorStatus = motor1.motorStates::FRONT;
     redLed.ledStatus = redLed.ledStates::ON;
   }
 
-  if( Ps3.event.button_down.r1 )
-  {
-    motor2.motorStatus = motor2.motorStates::FRONT;
-    redLed.ledStatus = redLed.ledStates::ON;
-  }
-
-  /*--------------- Digital D-pad button events --------------*/
-
-  if( Ps3.event.button_down.up )
-  {
-    motor1.motorStatus = motor1.motorStates::FRONT;
-    motor2.motorStatus = motor2.motorStates::FRONT;
-    redLed.ledStatus = redLed.ledStates::ON;
-  }
-
-  if( Ps3.event.button_down.left )
+  if( Ps3.event.button_down.l2 )        /*-------------- Digital left trigger button event -------------*/
   {
     motor1.motorStatus = motor1.motorStates::BACK;
+    redLed.ledStatus = redLed.ledStates::ON;
+  }
+  if( Ps3.event.button_up.l1 || Ps3.event.button_up.l2)   /*-------------- Digital left trigger button event -------------*/
+  {
+    motor1.motorStatus = motor1.motorStates::STOP;
+    redLed.ledStatus = redLed.ledStates::OFF;
+  }
+
+  /* ============================================= Motor 2 events =============================================*/
+
+  if( Ps3.event.button_down.r1 )      /*------------- Digital right shoulder button event -------------*/
+  {
     motor2.motorStatus = motor2.motorStates::FRONT;
     redLed.ledStatus = redLed.ledStates::ON;
   }
-
-  if( Ps3.event.button_down.right )
+  if( Ps3.event.button_down.r2 )      /*-------------- Digital right trigger button event -------------*/
   {
-    motor1.motorStatus = motor1.motorStates::FRONT;
     motor2.motorStatus = motor2.motorStates::BACK;
     redLed.ledStatus = redLed.ledStates::ON;
   }
-
-  if( Ps3.event.button_down.down )
+  if( Ps3.event.button_up.r1 || Ps3.event.button_up.r2)  /*-------------- Digital right trigger button event -------------*/
   {
-    motor1.motorStatus = motor1.motorStates::BACK;
-    motor2.motorStatus = motor2.motorStates::BACK;
-    redLed.ledStatus = redLed.ledStates::ON;
+    motor2.motorStatus = motor2.motorStates::STOP;
+    redLed.ledStatus = redLed.ledStates::OFF;
   }
+
 
   /*---------- Digital select/start/ps button events ---------*/
-    if( Ps3.event.button_down.select )
+  if( Ps3.event.button_down.select )
+  {
+    if(motor1.FLIPStatus == motor1.motorStates::UNFLIP)
     {
-      if(motor1.FLIPStatus == motor1.motorStates::UNFLIP)
-      {
-        motor1.motorStatus = motor1.motorStates::FLIP;
-        motor2.motorStatus = motor2.motorStates::FLIP;
-        motor1.FLIPStatus = motor1.motorStatus;
-      }
-      else
-      {
-        motor1.motorStatus = motor1.motorStates::UNFLIP;
-        motor2.motorStatus = motor2.motorStates::UNFLIP;
-        motor1.FLIPStatus = motor1.motorStatus;
-      }
-      
-      delay(50);
+      motor1.FLIPStatus = motor1.motorStates::FLIP;
     }
+    else
+    {
+      motor1.FLIPStatus = motor1.motorStates::UNFLIP;
+    }
+    
+    delay(50);
+  }
 
-    if( Ps3.event.button_down.start )
+  if( Ps3.event.button_down.start )
+  {
+    if(motor1.ENABLEStatus == motor1.motorStates::DISABLE)
     {
-      if(motor1.ENABLEStatus == motor1.motorStates::DISABLE)
-      {
-        motor1.motorStatus = motor1.motorStates::ENABLE;
-        motor2.motorStatus = motor2.motorStates::ENABLE;
-        motor1.ENABLEStatus = motor1.motorStatus;
-        buzz.buzzStatus = buzz.buzzStates::INITBUZZER;
-        redLed.ledStatus = redLed.ledStates::BLINKTWICE;
-      }
-      else
-      {
-        motor1.motorStatus = motor1.motorStates::DISABLE;
-        motor2.motorStatus = motor2.motorStates::DISABLE;
-        motor1.ENABLEStatus = motor1.motorStatus;
-        buzz.buzzStatus = buzz.buzzStates::DEINITBUZZER;
-        redLed.ledStatus = redLed.ledStates::TOGGLE;
-      }
+      motor1.motorStatus = motor1.motorStates::ENABLE;
+      motor2.motorStatus = motor2.motorStates::ENABLE;
       
-      delay(50);
+      motor1.ENABLEStatus = motor1.motorStates::ENABLE;
+      buzz.buzzStatus = buzz.buzzStates::INITBUZZER;
+      redLed.ledStatus = redLed.ledStates::BLINKTWICE;
     }
+    else
+    {
+      motor1.motorStatus = motor1.motorStates::DISABLE;
+      motor2.motorStatus = motor2.motorStates::DISABLE;
+
+      motor1.ENABLEStatus = motor1.motorStates::DISABLE;
+      buzz.buzzStatus = buzz.buzzStates::DEINITBUZZER;
+      redLed.ledStatus = redLed.ledStates::TOGGLE;
+    }
+    
+    delay(50);
+  }
 
   /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Motor State machine ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -328,14 +273,14 @@ void notify()
   if( battery != Ps3.data.status.battery )
   {
       battery = Ps3.data.status.battery;
-      Serial.print("The controller battery is ");
-      if( battery == ps3_status_battery_charging )      Serial.println("charging");
-      else if( battery == ps3_status_battery_full )     Serial.println("FULL");
-      else if( battery == ps3_status_battery_high )     Serial.println("HIGH");
-      else if( battery == ps3_status_battery_low)       Serial.println("LOW");
-      else if( battery == ps3_status_battery_dying )    Serial.println("DYING");
-      else if( battery == ps3_status_battery_shutdown ) Serial.println("SHUTDOWN");
-      else Serial.println("UNDEFINED");
+      debug("The controller battery is ");
+      if( battery == ps3_status_battery_charging )      debugln("charging");
+      else if( battery == ps3_status_battery_full )     debugln("FULL");
+      else if( battery == ps3_status_battery_high )     debugln("HIGH");
+      else if( battery == ps3_status_battery_low)       debugln("LOW");
+      else if( battery == ps3_status_battery_dying )    debugln("DYING");
+      else if( battery == ps3_status_battery_shutdown ) debugln("SHUTDOWN");
+      else debugln("UNDEFINED");
   }
 
 }

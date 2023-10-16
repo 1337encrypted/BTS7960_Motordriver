@@ -1,6 +1,5 @@
 /*Cannot create a .cpp file as inline prototypes need the function to be present in the same file as they are defined*/
 
-#include "CONFIG.h"
 #ifndef BUZZER_h
 #define BUZZER_h
 
@@ -14,6 +13,7 @@ class buzzer
 {
   private: 
   uint8_t buzzPin, PWMChannel, resolution, buzzId;
+  bool debugStatus;
   uint32_t freq;
 
   public:
@@ -31,7 +31,7 @@ class buzzer
 
   //Function prototype
   inline void begin() __attribute__((always_inline));
-  inline buzzer(uint8_t=-1, uint8_t=-1, uint8_t=-1, uint32_t=5000, uint8_t=-1) __attribute__((always_inline));
+  inline buzzer(uint8_t=-1, uint8_t=-1, uint8_t=-1, uint16_t=5000, uint8_t=-1, bool=false) __attribute__((always_inline));
   inline ~buzzer() __attribute__((always_inline));
   inline void initBuzzer() __attribute__((always_inline));
   inline void deinitBuzzer() __attribute__((always_inline));
@@ -46,7 +46,7 @@ class buzzer
 
 
 //Parametrized constructor
-buzzer::buzzer(uint8_t buzzPin, uint8_t PWMChannel, uint8_t resolution, uint32_t freq, uint8_t buzzId)
+buzzer::buzzer(uint8_t buzzPin, uint8_t PWMChannel, uint8_t resolution, uint16_t freq, uint8_t buzzId, bool debugStatus)
 {
   //Initilize the buzzer
   this->buzzPin = buzzPin;
@@ -54,7 +54,7 @@ buzzer::buzzer(uint8_t buzzPin, uint8_t PWMChannel, uint8_t resolution, uint32_t
   this->resolution = resolution;
   this->freq = freq;
   this->buzzId = buzzId;
-
+  this->debugStatus = debugStatus;
   //Begin and enable happens after object construction
   begin();
 }
@@ -68,13 +68,13 @@ void buzzer::begin()
   ledcAttachPin(this->buzzPin, this->PWMChannel);
   ledcWrite(this->PWMChannel, 0);
 
-  debugln(this->buzzId+" object initilized");
+  if(this->debugStatus) Serial.println(this->buzzId+" object initilized");
 }
 
 //Destructor
 buzzer::~buzzer()
 {
-  debugln("buzzer object destroyed"); 
+  if(this->debugStatus) Serial.println("buzzer object destroyed"); 
 }
 
 void buzzer::initBuzzer()

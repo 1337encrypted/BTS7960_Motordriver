@@ -10,8 +10,6 @@
 
 /*Cannot create a .cpp file as  prototypes need the function to be present in the same file*/
 
-#include "CONFIG.h"
-
 #ifndef BTS7960_ESP32_h
 #define BTS7960_ESP32_h
 
@@ -27,6 +25,7 @@ class BTS7960_ESP32
     uint8_t R_EN, L_EN, R_PWM, L_PWM, R_IS, L_IS, ID, resolution, PWMChannel1, PWMChannel2;
     uint32_t freq;
     static String version;
+    bool debugStatus;
     const int DEFAULTSPEED = 0;
     
     public:
@@ -60,7 +59,7 @@ class BTS7960_ESP32
     
     /*=============================================Function prototyping section=====================================================*/
     inline BTS7960_ESP32();
-    inline BTS7960_ESP32(uint8_t, uint8_t, uint8_t, uint8_t, uint32_t=-1, uint8_t=12, uint8_t=-1, uint8_t=-1, uint8_t=-1, uint8_t=-1, uint8_t=-1); // L_EN, R_EN, L_PWM, R_PWM, L_IS, R_IS, ID
+    inline BTS7960_ESP32(uint8_t=-1, uint8_t=-1, uint8_t=-1, uint8_t=-1, uint32_t=1000, uint8_t=8, uint8_t=-1, uint8_t=-1, uint8_t=-1, uint8_t=-1, uint8_t=-1, bool=false); // L_EN, R_EN, L_PWM, R_PWM, L_IS, R_IS, ID
     inline void begin() __attribute__((always_inline));
     inline void enable() __attribute__((always_inline));
     inline void disable() __attribute__((always_inline));
@@ -69,20 +68,19 @@ class BTS7960_ESP32
     inline void stop() __attribute__((always_inline));
     inline void alarm() __attribute__((always_inline));
     inline static void printInfo() __attribute__((always_inline));
-    
     inline ~BTS7960_ESP32() __attribute__((always_inline));
     /*===============================================================================================================================*/
 };
 
 //Static variables initilisation
 
-    String BTS7960_ESP32::version="";
+String BTS7960_ESP32::version="";
 
 //Default constructor
 BTS7960_ESP32::BTS7960_ESP32(){}
 
 //Parametrised constructor with 6 parameters (still need to work on it, avoid it for right now)
-BTS7960_ESP32::BTS7960_ESP32(uint8_t L_EN, uint8_t R_EN, uint8_t L_PWM, uint8_t R_PWM, uint32_t freq, uint8_t resolution, uint8_t PWMChannel1, uint8_t PWMChannel2, uint8_t L_IS, uint8_t R_IS, uint8_t ID)
+BTS7960_ESP32::BTS7960_ESP32(uint8_t L_EN, uint8_t R_EN, uint8_t L_PWM, uint8_t R_PWM, uint32_t freq, uint8_t resolution, uint8_t PWMChannel1, uint8_t PWMChannel2, uint8_t L_IS, uint8_t R_IS, uint8_t ID, bool debugStatus)
 {
     //Motor driver 1 pin definitions
     this->L_EN = L_EN;
@@ -98,8 +96,11 @@ BTS7960_ESP32::BTS7960_ESP32(uint8_t L_EN, uint8_t R_EN, uint8_t L_PWM, uint8_t 
     this->ID = ID;                  //for seial monitor display
     this->speed = 155;
     this->version = "1.0.0";
+    this->debugStatus = debugStatus;
     
     begin();
+    enable();
+    printInfo();
 }
 
 void BTS7960_ESP32::begin()
@@ -108,7 +109,7 @@ void BTS7960_ESP32::begin()
     if(this->R_EN > 0)  pinMode(this->L_EN, OUTPUT);
     if(this->L_PWM > 0) pinMode(this->L_PWM, OUTPUT);   //PWM is for direction and pwm
     if(this->R_PWM > 0) pinMode(this->R_PWM, OUTPUT);
-    if(this->R_IS > 0 ) pinMode(this->R_IS, INPUT);     //R_IS and L_IS alarm pins
+    if(this->R_IS > 0) pinMode(this->R_IS, INPUT);     //R_IS and L_IS alarm pins
     if(this->L_IS > 0)  pinMode(this->L_IS, INPUT);
 
     // Configure PWM channels
@@ -118,8 +119,6 @@ void BTS7960_ESP32::begin()
     // Attach PWM channels to pins
     ledcAttachPin(this->L_PWM, this->PWMChannel1);
     ledcAttachPin(this->R_PWM, this->PWMChannel2);
-    
-    enable();
 }
 
 void BTS7960_ESP32::enable()
@@ -127,7 +126,8 @@ void BTS7960_ESP32::enable()
     //Setting the BTS7960_ESP32 enable pins high
     digitalWrite(this->R_EN, HIGH);
     digitalWrite(this->L_EN, HIGH);
-    debugln((String)this->ID+" initilized and enabled");
+
+    if(this->debugStatus) Serial.println((String)this->ID+" initilized and enabled");
 }
 
 void BTS7960_ESP32::disable()
@@ -135,28 +135,32 @@ void BTS7960_ESP32::disable()
     //Setting the BTS7960_ESP32 enable pins high
     digitalWrite(this->R_EN, LOW);
     digitalWrite(this->L_EN, LOW);
-    debugln("Motor driver disabled");
+
+    if(this->debugStatus) Serial.println("Motor driver disabled");
 }
 
 void BTS7960_ESP32::stop()
 {
     ledcWrite(this->PWMChannel1,this->DEFAULTSPEED);
     ledcWrite(this->PWMChannel2,this->DEFAULTSPEED);
-    debugln("Motor "+(String)ID+" STOP: "+this->DEFAULTSPEED);
+    
+    if(this->debugStatus) Serial.println("Motor "+(String)ID+" STOP: "+this->DEFAULTSPEED);
 }
 
 void BTS7960_ESP32::front()
 {
     ledcWrite(this->PWMChannel1,this->DEFAULTSPEED);
     ledcWrite(this->PWMChannel2,this->speed);
-    debugln("Motor "+(String)ID+" FRONT: "+this->speed);
+    
+    if(this->debugStatus) Serial.println("Motor "+(String)ID+" FRONT: "+this->speed);
 }
 
 void BTS7960_ESP32::back()
 {
     ledcWrite(this->PWMChannel1,this->speed);
     ledcWrite(this->PWMChannel2,this->DEFAULTSPEED);
-    debugln("Motor "+(String)ID+" BACK: "+this->speed);
+    
+    if(this->debugStatus) Serial.println("Motor "+(String)ID+" BACK: "+this->speed);
 }
 
 void BTS7960_ESP32::alarm()
@@ -164,17 +168,17 @@ void BTS7960_ESP32::alarm()
     if(digitalRead(L_IS) || digitalRead(R_IS))
     {
         disable();
-        debugln("High current alarm");
+        if(this->debugStatus) Serial.println("High current alarm");
     }  
 }
 
 void BTS7960_ESP32::printInfo()
 {
-  debugln();
-  debugln("BTS7960_ESP32 Motordriver library");
-  debugln("Library version:");
-  debugln(version);
-  debugln("Yash Herekar 2023");
+  Serial.println();
+  Serial.println("BTS7960_ESP32 Motordriver library");
+  Serial.println("Library version:");
+  Serial.println(version);
+  Serial.println("Yash Herekar 2023");
   
   delay(1000);
 }
@@ -182,7 +186,7 @@ void BTS7960_ESP32::printInfo()
 //Destructor
 BTS7960_ESP32::~BTS7960_ESP32()
 {
-  debugln("motor object destroyed");
+  if(this->debugStatus) Serial.println("motor object destroyed");
 }
 
 #endif  //END BTS7960_ESP32_H
