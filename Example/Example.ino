@@ -1,7 +1,8 @@
-#include <BTS7960.h>
+#include "BTS7960_Motordriver.h"
+
 //BTS7960 works between +3v and +5v so you can use a uno, mega or a nano.
-#define L_EN 2
-#define R_EN 4
+#define L_EN 7
+#define R_EN 8
 #define L_PWM 5                             //pin 5 supports 980hz pwm frequency
 #define R_PWM 6                             //pin 6 supports 980hz pwm frequency
 
@@ -19,7 +20,7 @@ void loop() {
   {
     motor1.pwm = i;                         //Set the speed, by default the speed is set to 255 you can change it 
     motor1.front();                         //front functions should turn the motor in clockwise direction
-    delay(500);
+    // delay(500);
   }
   motor1.stop();                            //stop function should halt the motor by applying 0 pwm to both R_PWM and L_PWM
   delay(500);
@@ -27,8 +28,8 @@ void loop() {
   { 
     motor1.pwm = i;                         //Set the speed
     motor1.back();                          //back functions should turn the motor in anti-clockwise direction
-    delay(500);
+    // delay(500);
   }
   delay(500);
-  motor1.disable();                         //This method will set the L_EN and R_EN to LOW or digitalWrite them to 0v
+  // motor1.disable();                         //This method will set the L_EN and R_EN to LOW or digitalWrite them to 0v
 }

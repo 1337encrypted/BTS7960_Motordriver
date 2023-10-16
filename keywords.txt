@@ -9,6 +9,7 @@ disable	KEYWORD2
 stop	KEYWORD2
 front	KEYWORD2
 back	KEYWORD2
+alarm	KEYWORD2
 
 # Constants (LITERAL1)
 pwm	LITERAL1
