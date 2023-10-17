@@ -43,8 +43,7 @@ class led
 
 void led::begin()
 {
-  // ledPin pins set as output
-  pinMode(ledPin, OUTPUT);
+  if(this->ledPin > 0)  pinMode(ledPin, OUTPUT);
 }
 
 //parametrized constructor
@@ -52,10 +51,10 @@ led::led(const uint8_t ledPin, const String ledId, bool debugStatus)
 {
   //Initilize the ledPin pins
   this->ledPin = ledPin;
-  this->debugStatus = debugStatus;
   this->ledId = ledId;
+  this->debugStatus = debugStatus;
 
-  //Begin and enable happens after object construction
+  //Begin happens after object construction
   begin();
 }
 
@@ -79,31 +78,31 @@ void led::off()
 
 void led::toggle()
 {
-  static unsigned long ledMillis = millis();    //Assigns the current snapshot of time only the first
-                                              //time this code executes
+  static unsigned long ledMillis = millis(); /*Assigns the current snapshot of time only the first time this code executes*/
   if(millis() - ledMillis > 700)
   {
-    digitalWrite(ledPin, !digitalRead(ledPin));
+    digitalWrite(this->ledPin, !digitalRead(this->ledPin));
     ledMillis = millis();  
   }
 }
 
 void led:: blinkTwice()
 {
-  digitalWrite(ledPin, HIGH); 
+  digitalWrite(this->ledPin, HIGH); 
   delay(50);
-  digitalWrite(ledPin, LOW);
+  digitalWrite(this->ledPin, LOW);
   delay(50);
-  digitalWrite(ledPin, HIGH); 
+  digitalWrite(this->ledPin, HIGH); 
   delay(50);
-  digitalWrite(ledPin, LOW);
+  digitalWrite(this->ledPin, LOW);
   delay(50); 
 }
 
 void led::printInfo()
 {
-	if(debugStatus) Serial.println(this->ledId+" object initilized");
+	if(this->debugStatus) Serial.println(this->ledId+" object initilized");
 	delay(1000);
+  return;
 }
 
 #endif  //END led_h

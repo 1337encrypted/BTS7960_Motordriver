@@ -11,22 +11,12 @@ bool initOnce = true;
 const uint32_t freq = 1000;
 const uint8_t resolution = 8;
 
-const float MAXSPEED = 255;
-const float STICKUPVAL = 128;
-const float STICKDOWNVAL = 127;
-const uint8_t DeadBandPosVal = 10;
-const int8_t DeadBandNegVal = -10;
-
-//Check this value everytime you make changes
-float uSpeed = MAXSPEED/STICKUPVAL;
-float dSpeed = MAXSPEED/STICKDOWNVAL;
-
 //BTS7960 motor driver 2 pin definitions
 constexpr uint8_t leftMotorsId = 1;
 constexpr uint8_t RPWM1 = 26;
 constexpr uint8_t LPWM1 = 27;                   
 constexpr uint8_t R_EN1 = 25;  
-constexpr uint8_t L_EN1 = 34;
+constexpr uint8_t L_EN1 = 14;
 constexpr uint8_t R_IS1 = -1;        //Alarm pin
 constexpr uint8_t L_IS1 = -1;        //Alarm pin
 constexpr uint8_t PWMChannel1 = 1;
@@ -44,7 +34,7 @@ constexpr uint8_t PWMChannel3 = 3;
 constexpr uint8_t PWMChannel4 = 4; 
 
 //PS3 variables
-int player = 0;
+int player = 2;
 int battery = 0;
 
 
@@ -63,7 +53,7 @@ constexpr uint8_t redLedPin = 17;
 constexpr uint8_t buzzpin = 3; //Active buzzer use 100 ohms resistor
 constexpr uint8_t PWMChannelBuzz = 5;
 constexpr uint8_t resolutionBuzz = 8;
-constexpr uint8_t freqBuzz = 5000;
+uint8_t freqBuzz = 1000;
 constexpr uint8_t buzzId = 1;
 
 /*=====================================================  Object declaration=============================================================*/                                                   // Create iBus Object
@@ -73,9 +63,10 @@ led redLed(redLedPin, redLedId, LEDDEBUG);                                      
 // led blueLed(blueLedPin, blueLedId, LEDDEBUG);                                                                                //Create object for blue led
 buzzer buzz(buzzpin, PWMChannelBuzz, resolutionBuzz, freqBuzz, buzzId, BUZZERDEBUG);                                            //Create object for buzzer
 /*==================================================Function section========================================================*/
+
 void onConnect()
 {
-    debugln("Connected.");
+  debugln("Connected.");
 }
 
 //namespaces here

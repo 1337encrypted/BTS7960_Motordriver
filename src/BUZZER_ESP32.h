@@ -55,14 +55,15 @@ buzzer::buzzer(uint8_t buzzPin, uint8_t PWMChannel, uint8_t resolution, uint16_t
   this->freq = freq;
   this->buzzId = buzzId;
   this->debugStatus = debugStatus;
-  //Begin and enable happens after object construction
+
+  //Begin happens after object construction
   begin();
 }
 
 void buzzer::begin()
 {
   //buzzer pin as output
-  if(buzzPin > 0) pinMode(buzzPin, OUTPUT);
+  if(this->buzzPin > 0) pinMode(buzzPin, OUTPUT);
 
   ledcSetup(this->PWMChannel, this->freq, this->resolution); // 5 kHz frequency, 8-bit resolution
   ledcAttachPin(this->buzzPin, this->PWMChannel);
@@ -74,6 +75,7 @@ void buzzer::begin()
 //Destructor
 buzzer::~buzzer()
 {
+  ledcDetachPin(this->buzzPin);
   if(this->debugStatus) Serial.println("buzzer object destroyed"); 
 }
 
@@ -102,6 +104,8 @@ void buzzer::deinitBuzzer()
 void buzzer::alarm()
 {
   tone(1000, 100);
+  delay(100);
+  noTone();
 }
 
 void buzzer::off()
@@ -111,8 +115,7 @@ void buzzer::off()
 
 void buzzer::on()
 {
-  static unsigned long buzzMillis = millis();                   //Assigns the current snapshot of time only the first
-                                                                //time this code executes
+  static unsigned long buzzMillis = millis(); /*Assigns the current snapshot of time only the first time this code executes*/
   if(millis() - buzzMillis > 10)
   {
     tone(1000, 100);
@@ -124,10 +127,8 @@ void buzzer::tone(uint16_t freq, uint32_t duration)
 {
   ledcWriteTone(this->PWMChannel, freq);
   if (duration > 0) 
-  {
     delay(duration);
-    noTone();
-  }
+  noTone();
 }
 
 void buzzer::noTone() 
@@ -136,3 +137,41 @@ void buzzer::noTone()
 }
 
 #endif  //END BUZZER_H
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ BUZZER State machine ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/*
+  switch(buzz.buzzStatus)
+  {
+    // INITBUZZER
+    case buzz.buzzStates::INITBUZZER:
+    buzz.initBuzzer();
+    break;
+
+    //DEINITBUZZER
+    case buzz.buzzStates::DEINITBUZZER:
+    buzz.deinitBuzzer();
+    break;
+
+    //ALARM
+    case buzz.buzzStates::ALARM:
+    buzz.alarm();
+    break;
+
+    //ON
+    case buzz.buzzStates::ON:
+    buzz.on();
+    break;
+
+    //OFF
+    case buzz.buzzStates::OFF:
+    buzz.off();
+    break;
+
+    //TONE
+    // case buzz.buzzStates::TONE:
+    // buzz.tone(uint16_t freq);
+    // break;
+  }
+
+  */
