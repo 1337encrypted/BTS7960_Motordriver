@@ -1,7 +1,7 @@
 #include <Ps3Controller.h>
 #include "BTS7960_ESP32.h"
 #include "LED.h"
-#include "BUZZER_ESP32.h"
+//#include "BUZZER_ESP32.h"
 #include "CONFIG.h"
 
 // Miscellaneous variables
@@ -51,9 +51,9 @@ constexpr uint8_t redLedPin = 17;
 
 //Buzzer definition section
 constexpr uint8_t buzzpin = 3; //Active buzzer use 100 ohms resistor
-constexpr uint8_t PWMChannelBuzz = 5;
-constexpr uint8_t resolutionBuzz = 8;
-uint8_t freqBuzz = 1000;
+// constexpr uint8_t PWMChannelBuzz = 5;
+// constexpr uint8_t resolutionBuzz = 8;
+// uint8_t freqBuzz = 1000;
 constexpr uint8_t buzzId = 1;
 
 /*=====================================================  Object declaration=============================================================*/                                                   // Create iBus Object
@@ -61,7 +61,8 @@ BTS7960_ESP32 motor1(L_EN1, R_EN1, LPWM1, RPWM1, freq, resolution, PWMChannel1, 
 BTS7960_ESP32 motor2(L_EN2, R_EN2, RPWM2, LPWM2, freq, resolution, PWMChannel3, PWMChannel4, L_IS2, R_IS2, rightMotorsId, MOTORDEBUG);      //Create an object of class motor2 should have been LPWM2, RPWM2
 led redLed(redLedPin, redLedId, LEDDEBUG);                                                                                      //Create object for red led
 // led blueLed(blueLedPin, blueLedId, LEDDEBUG);                                                                                //Create object for blue led
-buzzer buzz(buzzpin, PWMChannelBuzz, resolutionBuzz, freqBuzz, buzzId, BUZZERDEBUG);                                            //Create object for buzzer
+//buzzer buzz(buzzpin, PWMChannelBuzz, resolutionBuzz, freqBuzz, buzzId, BUZZERDEBUG);                                            //Create object for buzzer
+//buzzer buzz(buzzpin, buzzId, BUZZERDEBUG);                                            //Create object for buzzer
 /*==================================================Function section========================================================*/
 
 void onConnect()

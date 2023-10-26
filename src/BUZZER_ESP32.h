@@ -1,7 +1,6 @@
 /*Cannot create a .cpp file as inline prototypes need the function to be present in the same file as they are defined*/
-
-#ifndef BUZZER_h
-#define BUZZER_h
+#ifndef buzzer_h
+#define buzzer_h
 
 #if (ARDUINO >= 100) 
   #include "Arduino.h"
@@ -9,82 +8,62 @@
   #include "WProgram.h"
 #endif
 
+/*
+  NOTE: All the pins can be used with the tone library including the non PWM pins
+*/
 class buzzer
 {
   private: 
-  uint8_t buzzPin, PWMChannel, resolution, buzzId;
+  String buzzId;
+  uint8_t buzzPin;
   bool debugStatus;
-  uint32_t freq;
 
   public:
-
-  enum buzzStates : uint8_t
-  {
-    INITBUZZER,
-    DEINITBUZZER,
-    ALARM,
-    ON,
-    OFF,
-    TONE
-  };
-  buzzStates buzzStatus = buzzStates::OFF;
-
   //Function prototype
   inline void begin() __attribute__((always_inline));
-  inline buzzer(uint8_t=-1, uint8_t=-1, uint8_t=-1, uint16_t=5000, uint8_t=-1, bool=false) __attribute__((always_inline));
+  inline buzzer(const uint8_t=-1, const uint8_t=-1, bool=false) __attribute__((always_inline));
   inline ~buzzer() __attribute__((always_inline));
   inline void initBuzzer() __attribute__((always_inline));
   inline void deinitBuzzer() __attribute__((always_inline));
   inline void alarm() __attribute__((always_inline));
+  inline void nonBlockToneOn() __attribute__((always_inline));
+  inline void nonBlockToneInit() __attribute__((always_inline));
   inline void on() __attribute__((always_inline));
   inline void off() __attribute__((always_inline));
-  inline void tone(uint16_t, uint32_t = 0) __attribute__((always_inline));
-  inline void noTone() __attribute__((always_inline));
-	
+  inline void printInfo() __attribute__((always_inline));
+  
 };
 
-
-
 //Parametrized constructor
-buzzer::buzzer(uint8_t buzzPin, uint8_t PWMChannel, uint8_t resolution, uint16_t freq, uint8_t buzzId, bool debugStatus)
+buzzer::buzzer(const uint8_t buzzPin, const uint8_t buzzId, bool debugStatus)
 {
   //Initilize the buzzer
   this->buzzPin = buzzPin;
-  this->PWMChannel = PWMChannel;
-  this->resolution = resolution;
-  this->freq = freq;
-  this->buzzId = buzzId;
   this->debugStatus = debugStatus;
+  this->buzzId = buzzId;
 
-  //Begin happens after object construction
+  //Begin and enable happens after object construction
   begin();
-}
-
-void buzzer::begin()
-{
-  //buzzer pin as output
-  if(this->buzzPin > 0) pinMode(buzzPin, OUTPUT);
-
-  ledcSetup(this->PWMChannel, this->freq, this->resolution); // 5 kHz frequency, 8-bit resolution
-  ledcAttachPin(this->buzzPin, this->PWMChannel);
-  ledcWrite(this->PWMChannel, 0);
-
-  if(this->debugStatus) Serial.println(this->buzzId+" object initilized");
 }
 
 //Destructor
 buzzer::~buzzer()
 {
-  ledcDetachPin(this->buzzPin);
-  if(this->debugStatus) Serial.println("buzzer object destroyed"); 
+  Serial.println("buzzer object destroyed"); 
+}
+
+void buzzer::begin()
+{
+  //buzzer pin as output
+  pinMode(buzzPin, OUTPUT);
 }
 
 void buzzer::initBuzzer()
 {
   //InitBuzzer is for active buzzer
-  tone(2000, 100);
+  tone(buzzPin, 2000, 100);
   delay(100);
-  tone(1000, 100);
+  tone(buzzPin, 1000, 100);
   delay(200);
   noTone();
 }
@@ -92,86 +71,74 @@ void buzzer::initBuzzer()
 void buzzer::deinitBuzzer()
 {
   //InitBuzzer is for active buzzer
-  tone(2000, 100);
+  tone(buzzPin, 2000, 100);
   delay(150);
-  tone(1000, 100);
+  tone(buzzPin, 1000, 100);
   delay(150);
-  tone(500, 100);
+  tone(buzzPin, 500, 100);
   delay(150);  
-  noTone();
+  noTone(buzzPin);
 }
 
 void buzzer::alarm()
 {
-  tone(1000, 100);
-  delay(100);
-  noTone();
+  tone(buzzPin, 1000, 100);
 }
 
 void buzzer::off()
 {
-  noTone();
+  noTone(buzzPin);
 }
 
-void buzzer::on()
+void buzzer::nonBlockToneOn()
 {
-  static unsigned long buzzMillis = millis(); /*Assigns the current snapshot of time only the first time this code executes*/
-  if(millis() - buzzMillis > 10)
+  static unsigned long buzzMillis = millis();                   //Assigns the current snapshot of time only the first
+  if(millis() - buzzMillis > 1000)                               //time this code executes
   {
-    tone(1000, 100);
+    tone(buzzPin, 1000, 100);
     buzzMillis = millis();  
+    off();
   }
 }
 
-void buzzer::tone(uint16_t freq, uint32_t duration) 
+void buzzer::nonBlockToneInit()
 {
-  ledcWriteTone(this->PWMChannel, freq);
-  if (duration > 0) 
-    delay(duration);
-  noTone();
+  static unsigned long currentTime = millis();
+  static uint8_t currentTone = 1;
+
+  // Check if it's time to play the next tone
+  if (millis() - currentTime > 1000) {
+
+    // Play the appropriate tone based on the currentTone value
+    switch (currentTone) {
+      case 1:
+        tone(this->buzzPin, 2000, 150);
+        break;
+      case 2:
+        tone(this->buzzPin, 1500, 150);
+        break;
+      case 3:
+        tone(this->buzzPin, 1000, 150);
+        break;
+    }
+    // Update the previous time
+    currentTime = millis();
+    // Increment the currentTone value
+    currentTone++;
+
+    // Reset currentTone if it exceeds the total number of tones
+    if (currentTone > 3)
+      currentTone = 1;
+  }
 }
 
-void buzzer::noTone() 
+void buzzer::printInfo()
 {
-  ledcWrite(this->PWMChannel, 0);
+  Serial.println(this->buzzId+" object initilized");
+  delay(1000);
 }
+
 
 #endif  //END BUZZER_H
 
 
-/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ BUZZER State machine ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-/*
-  switch(buzz.buzzStatus)
-  {
-    // INITBUZZER
-    case buzz.buzzStates::INITBUZZER:
-    buzz.initBuzzer();
-    break;
-
-    //DEINITBUZZER
-    case buzz.buzzStates::DEINITBUZZER:
-    buzz.deinitBuzzer();
-    break;
-
-    //ALARM
-    case buzz.buzzStates::ALARM:
-    buzz.alarm();
-    break;
-
-    //ON
-    case buzz.buzzStates::ON:
-    buzz.on();
-    break;
-
-    //OFF
-    case buzz.buzzStates::OFF:
-    buzz.off();
-    break;
-
-    //TONE
-    // case buzz.buzzStates::TONE:
-    // buzz.tone(uint16_t freq);
-    // break;
-  }
-
-  */

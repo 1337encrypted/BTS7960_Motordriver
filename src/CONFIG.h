@@ -17,8 +17,8 @@
   #define debugln(x) Serial.println(x)
   #define MOTORDEBUG true
   #define LEDDEBUG false
-  #define BUZZERDEBUG true
-  #define SYSTEMDEBUG true
+  #define BUZZERDEBUG false
+  #define SYSTEMDEBUG false
 #else
   #define debug(x)
   #define debugln(x) 

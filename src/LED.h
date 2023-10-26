@@ -88,14 +88,10 @@ void led::toggle()
 
 void led:: blinkTwice()
 {
-  digitalWrite(this->ledPin, HIGH); 
-  delay(50);
-  digitalWrite(this->ledPin, LOW);
-  delay(50);
-  digitalWrite(this->ledPin, HIGH); 
-  delay(50);
-  digitalWrite(this->ledPin, LOW);
-  delay(50); 
+  toggle();
+  toggle();
+  toggle();
+  toggle();
 }
 
 void led::printInfo()
