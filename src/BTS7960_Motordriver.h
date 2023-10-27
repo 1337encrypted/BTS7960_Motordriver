@@ -35,7 +35,7 @@ class BTS7960
     public:
 
     //pwm variable to control the speed of motor
-    volatile uint8_t pwm;
+    uint8_t pwm;
     
     /*=============================================Function prototyping section=====================================================*/
     inline BTS7960(uint8_t=-1, uint8_t=-1, uint8_t=-1, uint8_t=-1, uint8_t=-1, uint8_t=-1, String id = "", bool=false); // L_EN, R_EN, L_PWM, R_PWM, L_IS, R_IS, _debug
@@ -68,7 +68,7 @@ BTS7960::BTS7960(uint8_t L_EN, uint8_t R_EN, uint8_t L_PWM, uint8_t R_PWM, uint8
     this->R_PWM = R_PWM;    //pin 6 has PWM frequency of 980Hz
     this->L_IS = L_IS;      //Alarm pin
     this->R_IS = R_IS;      //Alarm pin
-    this->debug = debug;   //for seial monitor display
+    this->debug = debug;    //for seial monitor display
     
     //Set the global pwm variable to 255
     this->pwm = 255;

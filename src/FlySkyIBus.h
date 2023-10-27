@@ -141,17 +141,20 @@ uint16_t FlySkyIBus::readChannel(uint8_t channelNr)
 {
     if (channelNr < PROTOCOL_CHANNELS)
     {
-        if(channel[channelNr] < 1000)
+        if(channel[channelNr] < 1000 && channel[channelNr] > 0)
           return 1000;
         else if(channel[channelNr] > 2000)
           return 2000;
-          
-        return channel[channelNr];
+        else if(channel[channelNr] == 0)
+          return 0;
+        
+        return channel[channelNr];  
     }
     else
     {
         return 0;
     }
+
 }
 
 bool FlySkyIBus::readSwitch(uint8_t channelNr)
