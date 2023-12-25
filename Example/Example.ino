@@ -6,8 +6,7 @@
 #define L_PWM 5                             //pin 5 supports 980hz pwm frequency
 #define R_PWM 6                             //pin 6 supports 980hz pwm frequency
 
-BTS7960 motor1(L_EN, R_EN, L_PWM, R_PWM);   //This method will create a object of the class BTS7960
-
+BTS7960 motor1(L_EN, R_EN, L_PWM, R_PWM,-1,-1,1);   //This method will create a object of the class BTS7960
 void setup() {
   Serial.begin(9600);                       //begin the serial monitor for output
   motor1.begin();                           //This method will set the motor driver pins as output
@@ -16,7 +15,7 @@ void setup() {
 
 void loop() {
   
-  for(int i=0; i<=255; i=i+10)
+  for(int i=0; i<=255; i++)
   {
     motor1.pwm = i;                         //Set the speed, by default the speed is set to 255 you can change it 
     motor1.front();                         //front functions should turn the motor in clockwise direction
@@ -24,7 +23,7 @@ void loop() {
   }
   motor1.stop();                            //stop function should halt the motor by applying 0 pwm to both R_PWM and L_PWM
   delay(500);
-  for(int i=0; i<=255; i=i+10)
+  for(int i=255; i>=0; i--)
   { 
     motor1.pwm = i;                         //Set the speed
     motor1.back();                          //back functions should turn the motor in anti-clockwise direction

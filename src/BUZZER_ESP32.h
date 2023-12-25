@@ -18,6 +18,8 @@ class buzzer
   uint8_t buzzPin;
   bool debugStatus;
 
+  
+
   public:
   //Function prototype
   inline void begin() __attribute__((always_inline));
@@ -28,7 +30,6 @@ class buzzer
   inline void alarm() __attribute__((always_inline));
   inline void nonBlockToneOn() __attribute__((always_inline));
   inline void nonBlockToneInit() __attribute__((always_inline));
-  inline void on() __attribute__((always_inline));
   inline void off() __attribute__((always_inline));
   inline void printInfo() __attribute__((always_inline));
   
@@ -65,7 +66,7 @@ void buzzer::initBuzzer()
   delay(100);
   tone(buzzPin, 1000, 100);
   delay(200);
-  noTone();
+  noTone(buzzPin);
 }
 
 void buzzer::deinitBuzzer()
@@ -77,12 +78,13 @@ void buzzer::deinitBuzzer()
   delay(150);
   tone(buzzPin, 500, 100);
   delay(150);  
-  noTone(buzzPin);
+  off();
 }
 
 void buzzer::alarm()
 {
-  tone(buzzPin, 1000, 100);
+  tone(buzzPin, 1000, 10);
+  off();
 }
 
 void buzzer::off()

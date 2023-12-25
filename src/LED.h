@@ -88,10 +88,14 @@ void led::toggle()
 
 void led:: blinkTwice()
 {
-  toggle();
-  toggle();
-  toggle();
-  toggle();
+  on();
+  delay(50);
+  off();
+  delay(50);
+  on();
+  delay(50);
+  off();
+  delay(50);
 }
 
 void led::printInfo()

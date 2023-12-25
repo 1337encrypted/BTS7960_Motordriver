@@ -10,28 +10,28 @@ void notify()
   {
     motor1.speed = 255;
     motor2.speed = 255;
-    //buzz.nonBlockToneOn();
+    buzz.alarm();
   }
 
   if( abs(Ps3.event.analog_changed.button.circle) > 100)
   {
     motor1.speed = 190;
     motor2.speed = 190;
-    //buzz.nonBlockToneOn();
+    buzz.alarm();
   }
 
   if( abs(Ps3.event.analog_changed.button.cross) > 100)
   {
     motor1.speed = 100;
     motor2.speed = 100;
-    //buzz.nonBlockToneOn();
+    buzz.alarm();
   }
 
   if( abs(Ps3.event.analog_changed.button.square) > 100)
   {
     motor1.speed = 120;
     motor2.speed = 120;
-    //buzz.nonBlockToneOn();
+    buzz.alarm();
   }
 
   /* ============================================= Motor 1 events ============================================= */
@@ -121,10 +121,12 @@ void notify()
 
     case motor1.motorStates::ENABLE:
     motor1.enable();
+    buzz.initBuzzer();
     break;
 
     case motor1.motorStates::DISABLE:
     motor1.disable();
+    buzz.deinitBuzzer();
     break;
 
     case motor1.motorStates::STOP:
@@ -219,7 +221,8 @@ void loop()
   if(initOnce)
   {
     initOnce = false;
-    // buzz.nonBlockToneInit();
+    buzz.initBuzzer();
+    redLed.blinkTwice();
     // player = 2;
     debug("Setting LEDs to player "); 
     // Serial.println(player, DEC);
