@@ -96,9 +96,6 @@ BTS7960_ESP32::BTS7960_ESP32(uint8_t L_EN, uint8_t R_EN, uint8_t L_PWM, uint8_t 
   this->speed = 155;
   this->version = "1.0.0";
   this->debugStatus = debugStatus;
-  
-  begin();
-  enable();
 }
 
 void BTS7960_ESP32::begin()

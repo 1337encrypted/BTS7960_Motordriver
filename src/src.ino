@@ -207,10 +207,18 @@ void setup()
   Ps3.attach(notify);
   Ps3.attachOnConnect(onConnect);
   Ps3.begin("24:62:ab:dd:a1:d6");
-  //BUZZER HARDCODE FIX
-  //pinMode(buzzpin, OUTPUT);
 
-  Serial.println("Ready.");
+  motor1.begin();
+  motor1.enable();
+
+  motor2.begin();
+  motor2.enable();
+
+  redLed.begin();
+
+  buzz.begin();
+
+  debugln("Ready.");
 }
 
 void loop()

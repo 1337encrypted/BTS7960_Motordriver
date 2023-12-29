@@ -53,9 +53,6 @@ led::led(const uint8_t ledPin, const String ledId, bool debugStatus)
   this->ledPin = ledPin;
   this->ledId = ledId;
   this->debugStatus = debugStatus;
-
-  //Begin happens after object construction
-  begin();
 }
 
 //Destructor
