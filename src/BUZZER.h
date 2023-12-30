@@ -15,13 +15,13 @@ private:
     uint8_t buzzId;
     uint8_t buzzPin;
     uint8_t resolution;
-    uint8_t PWMChannel;
+    // uint8_t PWMChannel;
     bool debugStatus;
     uint32_t frequency;
     uint8_t ledTimer;
 
 public:
-    inline buzzer(uint8_t = -1, uint8_t = -1, uint8_t = -1, uint8_t = 8, uint32_t = 5000, bool = false); __attribute__((always_inline));
+    inline buzzer(uint8_t = -1, uint8_t = -1, uint8_t = 8, uint32_t = 5000, bool = false); __attribute__((always_inline));
     inline void begin() __attribute__((always_inline));
     inline ~buzzer() __attribute__((always_inline));
     inline void initBuzzer() __attribute__((always_inline));
@@ -29,14 +29,12 @@ public:
     inline void alarm() __attribute__((always_inline));
     inline void nonBlockToneOn() __attribute__((always_inline));
     inline void nonBlockToneInit() __attribute__((always_inline));
-    inline void printInfo() __attribute__((always_inline));
 };
 
-buzzer::buzzer(uint8_t buzzId, uint8_t buzzPin, uint8_t PWMChannel, uint8_t resolution, uint32_t frequency, bool debugStatus) 
+buzzer::buzzer(uint8_t buzzId, uint8_t buzzPin, uint8_t resolution, uint32_t frequency, bool debugStatus) 
 {
   this->buzzId = buzzId;
   this->buzzPin = buzzPin;
-  this->PWMChannel = PWMChannel;
   this->resolution = resolution;
   this->frequency = frequency;
   this->debugStatus = debugStatus;
@@ -45,41 +43,49 @@ buzzer::buzzer(uint8_t buzzId, uint8_t buzzPin, uint8_t PWMChannel, uint8_t reso
 
 void buzzer::begin() 
 {
-  ledcSetup(this->PWMChannel, this->frequency, this->resolution);  // Set LEDC channel 0 with a frequency of 5000 Hz and resolution of 8 bits
-  ledcAttachPin(this->buzzPin, this->PWMChannel);
-  initBuzzer();
+  // ledcSetup(this->PWMChannel, this->frequency, this->resolution);  // Set LEDC channel 0 with a frequency of 5000 Hz and resolution of 8 bits
+  ledcAttach(this->buzzPin, this->frequency, this->resolution);
+  deinitBuzzer();
+
+  if(debugStatus) debugln(String(this->buzzId)+" object initilized");
 }
 
 void buzzer::initBuzzer()
 {
   //InitBuzzer is for active buzzer
-  ledcWriteNote(this->PWMChannel, NOTE_E, 4);
+  ledcWriteNote(this->buzzPin, NOTE_E, 4);
   delay(200);
-  ledcWriteNote(this->PWMChannel, NOTE_C, 5);
+  ledcWriteNote(this->buzzPin, NOTE_C, 5);
   delay(200);
-  ledcWriteNote(this->PWMChannel, NOTE_G, 4);
+  ledcWriteNote(this->buzzPin, NOTE_G, 4);
   delay(200);
-  ledcWriteTone(this->PWMChannel, 0);
+  ledcWriteTone(this->buzzPin, 0);
+
+  if(debugStatus) debugln(String(this->buzzId)+": Init Buzzer");
 }
 
 void buzzer::deinitBuzzer()
 {
   //InitBuzzer is for active buzzer
-  ledcWriteNote(this->PWMChannel, NOTE_G, 3);
+  ledcWriteNote(this->buzzPin, NOTE_G, 3);
   delay(200);
-  ledcWriteNote(this->PWMChannel, NOTE_E, 3);
+  ledcWriteNote(this->buzzPin, NOTE_E, 3);
   delay(200);
-  ledcWriteNote(this->PWMChannel, NOTE_C, 3);
+  ledcWriteNote(this->buzzPin, NOTE_C, 3);
   delay(200);
-  ledcWriteTone(this->PWMChannel, 0);
+  ledcWriteTone(this->buzzPin, 0);
+
+  if(debugStatus) debugln(String(this->buzzId)+": deInit Buzzer");
 }
 
 void buzzer::alarm()
 {
-  // ledcWriteTone(this->PWMChannel, 1000);
-  ledcWriteNote(this->PWMChannel, NOTE_G, 4);
+  // ledcWriteTone(this->buzzPin, 1000);
+  ledcWriteNote(this->buzzPin, NOTE_G, 4);
   delay(20);
-  ledcWriteTone(this->PWMChannel, 0);
+  ledcWriteTone(this->buzzPin, 0);
+
+  if(debugStatus) debugln(String(this->buzzId)+": Alarm");
 }
 
 void buzzer::nonBlockToneOn()
@@ -87,10 +93,10 @@ void buzzer::nonBlockToneOn()
   static unsigned long buzzMillis = millis();                   //Assigns the current snapshot of time only the first
   if(millis() - buzzMillis > 1000)                               //time this code executes
   {
-    ledcWriteTone(this->PWMChannel, 1000);
+    ledcWriteTone(this->buzzPin, 1000);
     delay(100);
     buzzMillis = millis();  
-    ledcWriteTone(this->PWMChannel, 0);
+    ledcWriteTone(this->buzzPin, 0);
   }
 }
 
@@ -106,13 +112,13 @@ void buzzer::nonBlockToneInit()
     switch (currentTone) 
     {
       case 1:
-        ledcWriteTone(this->PWMChannel, 2000);
+        ledcWriteTone(this->buzzPin, 2000);
         break;
       case 2:
-        ledcWriteTone(this->PWMChannel, 1500);
+        ledcWriteTone(this->buzzPin, 1500);
         break;
       case 3:
-        ledcWriteTone(this->PWMChannel, 1000);
+        ledcWriteTone(this->buzzPin, 1000);
         break;
     }
     delay(150);
@@ -127,16 +133,10 @@ void buzzer::nonBlockToneInit()
   }
 }
 
-void buzzer::printInfo()
-{
-  debugln(String(this->buzzId)+" object initilized");
-  delay(1000);
-}
-
 //Destructor
 buzzer::~buzzer()
 {
-  ledcDetachPin(this->PWMChannel);
+  ledcDetach(this->buzzPin);
   // {
   //   debugln("buzzer object destroyed"); 
   // }

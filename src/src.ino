@@ -39,23 +39,27 @@ void notify()
   if( Ps3.event.button_down.l1 )        /*------------- Digital left shoulder button event -------------*/
   {
     motor1.motorStatus = motor1.motorStates::FRONT;
-    redLed.ledStatus = redLed.ledStates::ON;
+    redLed.ledStatus = redLed.ledStates::OFF;
+    blueLed.ledStatus = blueLed.ledStates::ON;
   }
 
   if( Ps3.event.button_down.l2 )        /*-------------- Digital left trigger button event -------------*/
   {
     motor1.motorStatus = motor1.motorStates::BACK;
-    redLed.ledStatus = redLed.ledStates::ON;
+    redLed.ledStatus = redLed.ledStates::OFF;
+    blueLed.ledStatus = blueLed.ledStates::ON;
   }
   if( Ps3.event.button_up.l1 )   /*-------------- Digital left trigger button event -------------*/
   {
     motor1.motorStatus = motor1.motorStates::STOP;
-    redLed.ledStatus = redLed.ledStates::OFF;
+    redLed.ledStatus = redLed.ledStates::ON;
+    blueLed.ledStatus = blueLed.ledStates::OFF;
   }
   if( Ps3.event.button_up.l2 )   /*-------------- Digital left trigger button event -------------*/
   {
     motor1.motorStatus = motor1.motorStates::STOP;
-    redLed.ledStatus = redLed.ledStates::OFF;
+    redLed.ledStatus = redLed.ledStates::ON;
+    blueLed.ledStatus = blueLed.ledStates::OFF;
   }
   
   /* ============================================= Motor 2 events =============================================*/
@@ -63,23 +67,27 @@ void notify()
   if( Ps3.event.button_down.r1 )      /*------------- Digital right shoulder button event -------------*/
   {
     motor2.motorStatus = motor2.motorStates::FRONT;
-    redLed.ledStatus = redLed.ledStates::ON;
+    redLed.ledStatus = redLed.ledStates::OFF;
+    blueLed.ledStatus = blueLed.ledStates::ON;
   }
   if( Ps3.event.button_down.r2 )      /*-------------- Digital right trigger button event -------------*/
   {
     motor2.motorStatus = motor2.motorStates::BACK;
-    redLed.ledStatus = redLed.ledStates::ON;
+    redLed.ledStatus = redLed.ledStates::OFF;
+    blueLed.ledStatus = blueLed.ledStates::ON;
   }
   if( Ps3.event.button_up.r1 )  /*-------------- Digital right trigger button event -------------*/
   {
     motor2.motorStatus = motor2.motorStates::STOP;
-    redLed.ledStatus = redLed.ledStates::OFF;
+    redLed.ledStatus = redLed.ledStates::ON;
+    blueLed.ledStatus = blueLed.ledStates::OFF;
   }
 
   if(Ps3.event.button_up.r2)
   {
     motor2.motorStatus = motor2.motorStates::STOP;
-    redLed.ledStatus = redLed.ledStates::OFF;
+    redLed.ledStatus = redLed.ledStates::ON;
+    blueLed.ledStatus = blueLed.ledStates::OFF;
   }
 
   /*---------- Digital select/start/ps button events ---------*/
@@ -163,7 +171,7 @@ void notify()
     break;
   }
 
-  /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LED State machine ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+  /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ REDLED State machine ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
   switch(redLed.ledStatus)
   {
@@ -181,6 +189,27 @@ void notify()
 
     case redLed.ledStates::BLINKTWICE:
     redLed.blinkTwice();
+    break;
+  }
+
+  /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ BLUELED State machine ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+  switch(blueLed.ledStatus)
+  {
+    case blueLed.ledStates::ON:
+    blueLed.on();
+    break;
+
+    case blueLed.ledStates::OFF:
+    blueLed.off();
+    break;
+
+    case blueLed.ledStates::TOGGLE:
+    blueLed.toggle();
+    break;
+
+    case blueLed.ledStates::BLINKTWICE:
+    blueLed.blinkTwice();
     break;
   }
 
@@ -218,7 +247,10 @@ void setup()
 
   buzz.begin();
 
-  debugln("Ready.");
+  blueLed.begin();
+  redLed.begin();
+
+  debugln("Ready");
 }
 
 void loop()
@@ -231,6 +263,7 @@ void loop()
     initOnce = false;
     buzz.initBuzzer();
     redLed.blinkTwice();
+    blueLed.blinkTwice();
     // player = 2;
     debug("Setting LEDs to player "); 
     // Serial.println(player, DEC);
