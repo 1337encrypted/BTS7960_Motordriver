@@ -4,13 +4,7 @@
  * DEBUG 1 will will add back Serial.print functions back to the code
  */
 
-#if (ARDUINO >= 100) 
-  #include "Arduino.h"
-#else
-  #include "WProgram.h"
-#endif
-
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG == 1
   #define debug(x) Serial.print(x)

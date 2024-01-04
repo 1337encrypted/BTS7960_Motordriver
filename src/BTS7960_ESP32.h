@@ -10,20 +10,20 @@
 
 /*Cannot create a .cpp file as  prototypes need the function to be present in the same file*/
 
-#ifndef BTS7960_ESP32_h
-#define BTS7960_ESP32_h
-
-#if (ARDUINO >= 100)
-    #include "Arduino.h"
-#else
-    #include "WProgram.h"
-#endif
-#include <driver/ledc.h>
+#pragma once
 
 class BTS7960_ESP32
 {
   private:
-  uint8_t R_EN, L_EN, R_PWM, L_PWM, R_IS, L_IS, ID, resolution;
+  uint8_t R_EN;
+  uint8_t L_EN;
+  uint8_t R_PWM;
+  uint8_t L_PWM;
+  uint8_t R_IS;
+  uint8_t L_IS;
+  uint8_t ID;
+  uint8_t resolution;
+
   uint32_t freq;
   static String version;
   bool debugStatus;
@@ -31,6 +31,11 @@ class BTS7960_ESP32
   
   public:
 
+  //pwm variable to control the speed of motor
+  uint8_t speed;
+  int deviation;
+  uint8_t oldMotorSpeed;
+  uint8_t changeSpeedInc, changeSpeedDec;
   /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++MOTOR STATES++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
   enum motorStates : uint8_t
@@ -52,14 +57,12 @@ class BTS7960_ESP32
   };
   motorStates motorStatus = motorStates::STOPALL;                        //State variable set to STOP initially
   // motorStates ENABLEStatus = motorStates::ENABLE;                     //Motor Enable state
-  motorStates FLIPStatus = motorStates::UNFLIP;                       //Motor FLIP state
+  // motorStates FLIPStatus = motorStates::UNFLIP;                       //Motor FLIP state
 
-  //pwm variable to control the speed of motor
-  uint8_t speed;
   
   /*=============================================Function prototyping section=====================================================*/
   inline BTS7960_ESP32();
-  inline BTS7960_ESP32(uint8_t=-1, uint8_t=-1, uint8_t=-1, uint8_t=-1, uint32_t=1000, uint8_t=8, uint8_t=-1, uint8_t=-1, uint8_t=-1, bool=false); // L_EN, R_EN, L_PWM, R_PWM, L_IS, R_IS, ID
+  inline BTS7960_ESP32(const uint8_t& = -1, const uint8_t& = -1, const uint8_t& = -1, const uint8_t& = -1, const uint32_t& = 1000, const uint8_t& = 8, const uint8_t& = -1, const uint8_t& = -1, const uint8_t& = -1, const bool& = false); // L_EN, R_EN, L_PWM, R_PWM, L_IS, R_IS, ID
   inline void begin() __attribute__((always_inline));
   inline void enable() __attribute__((always_inline));
   inline void disable() __attribute__((always_inline));
@@ -80,21 +83,23 @@ String BTS7960_ESP32::version="";
 BTS7960_ESP32::BTS7960_ESP32(){}
 
 //Parametrised constructor with 6 parameters (still need to work on it, avoid it for right now)
-BTS7960_ESP32::BTS7960_ESP32(uint8_t L_EN, uint8_t R_EN, uint8_t L_PWM, uint8_t R_PWM, uint32_t freq, uint8_t resolution, uint8_t L_IS, uint8_t R_IS, uint8_t ID, bool debugStatus)
+BTS7960_ESP32::BTS7960_ESP32(const uint8_t& L_EN, const uint8_t& R_EN, const uint8_t& L_PWM, const uint8_t& R_PWM, const uint32_t& freq, const uint8_t& resolution, const uint8_t& L_IS, const uint8_t& R_IS, const uint8_t& ID, const bool& debugStatus) :
+L_EN(L_EN),
+R_EN(R_EN),
+L_PWM(L_PWM),              //pin 5 has PWM frequency of 980Hz
+R_PWM(R_PWM),              //pin 6 has PWM frequency of 980Hz
+freq(freq),                //frequency set to 20 khz
+resolution(resolution),    //12 bit resolution
+L_IS(L_IS),                //Alarm pin
+R_IS(R_IS),                //Alarm pin
+ID(ID),                    //for seial monitor display
+debugStatus(debugStatus)
 {
-  //Motor driver 1 pin definitions
-  this->L_EN = L_EN;
-  this->R_EN = R_EN;
-  this->L_PWM = L_PWM;              //pin 5 has PWM frequency of 980Hz
-  this->R_PWM = R_PWM;              //pin 6 has PWM frequency of 980Hz
-  this->freq = freq;                //frequency set to 20 khz
-  this->resolution = resolution;    //12 bit resolution
-  this->L_IS = L_IS;                //Alarm pin
-  this->R_IS = R_IS;                //Alarm pin
-  this->ID = ID;                    //for seial monitor display
-  this->speed = 155;
-  this->version = "1.0.0";
-  this->debugStatus = debugStatus;
+  speed = 80;
+  version = "1.0.0";
+  oldMotorSpeed = 80;
+  changeSpeedInc = 60;
+  changeSpeedDec = 50;
 }
 
 void BTS7960_ESP32::begin()
@@ -188,5 +193,3 @@ BTS7960_ESP32::~BTS7960_ESP32()
   if(this->debugStatus) Serial.println("motor object destroyed");
   return;
 }
-
-#endif  //END BTS7960_ESP32_H

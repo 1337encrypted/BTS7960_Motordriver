@@ -1,12 +1,5 @@
 /*Cannot create a .cpp file as inline prototypes need the function to be present in the same file as they are defined*/
-#ifndef led_h
-#define led_h
-
-#if (ARDUINO >= 100) 
-  #include "Arduino.h"
-#else
-  #include "WProgram.h"
-#endif
+#pragma once
 
 constexpr uint8_t DUTYCYCLE100=255;
 constexpr uint8_t DUTYCYCLE0=0;
@@ -34,7 +27,7 @@ class led
   ledStates ledStatus = ledStates::OFF;
 
   //Function prototypes
-  inline led(const uint8_t=-1, uint32_t=-1000, uint8_t=8, const String="LED", bool=false) __attribute__((always_inline));
+  inline led(const uint8_t& = -1, const uint32_t& = 1000, const uint8_t& = 8, const String& = "LED", const bool& = false) __attribute__((always_inline));
   inline ~led() __attribute__((always_inline));
   inline void begin() __attribute__((always_inline));
   inline void on() __attribute__((always_inline));
@@ -45,20 +38,20 @@ class led
 };
 
 //parametrized constructor
-led::led(const uint8_t ledPin, const uint32_t frequency, const uint8_t resolution, const String ledId, bool debugStatus)
-{
-  //Initilize the ledPin pins
-  this->ledPin = ledPin;
-  this->ledId = ledId;
-  this->resolution = resolution;
-  this->frequency = frequency;
-  this->debugStatus = debugStatus;
-}
+led::led(const uint8_t& ledPin, const uint32_t& frequency, const uint8_t& resolution, const String& ledId, const bool& debugStatus) :
+ledPin(ledPin),
+ledId(ledId),
+resolution(resolution),
+frequency(frequency),
+debugStatus(debugStatus)
+{}
 
 void led::begin()
 {
   ledcAttach(this->ledPin, this->frequency, this->resolution);
   if(this->debugStatus) Serial.println(this->ledId+" object initilized");
+
+  blinkTwice();
 }
 
 void led::on()
@@ -114,5 +107,3 @@ led::~led()
   ledcDetach(this->ledPin);
   if(this->debugStatus) Serial.println(this->ledId+" object destroyed");
 }
-
-#endif  //END led_h

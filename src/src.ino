@@ -3,128 +3,51 @@
 
 void notify()
 {
-  /*---------------- Setting the speed ----------------
-  /*---- Analog cross/square/triangle/circle button events ----*/
+  //---------- Digital select/start/ps button events ---------
+  if( Ps3.event.button_down.start )
+  {
+    if(++stateCount == 3)
+      stateCount = 1;
 
-  if( abs(Ps3.event.analog_changed.button.triangle) > 100)
-  {
-    motor1.speed = 255;
-    motor2.speed = 255;
-    buzz.alarm();
-  }
-
-  if( abs(Ps3.event.analog_changed.button.circle) > 100)
-  {
-    motor1.speed = 190;
-    motor2.speed = 190;
-    buzz.alarm();
-  }
-
-  if( abs(Ps3.event.analog_changed.button.cross) > 100)
-  {
-    motor1.speed = 100;
-    motor2.speed = 100;
-    buzz.alarm();
-  }
-
-  if( abs(Ps3.event.analog_changed.button.square) > 100)
-  {
-    motor1.speed = 120;
-    motor2.speed = 120;
-    buzz.alarm();
-  }
-
-  /* ============================================= Motor 1 events ============================================= */
-
-  if( Ps3.event.button_down.l1 )        /*------------- Digital left shoulder button event -------------*/
-  {
-    motor1.motorStatus = motor1.motorStates::FRONT;
-    redLed.ledStatus = redLed.ledStates::OFF;
-    blueLed.ledStatus = blueLed.ledStates::ON;
-  }
-
-  if( Ps3.event.button_down.l2 )        /*-------------- Digital left trigger button event -------------*/
-  {
-    motor1.motorStatus = motor1.motorStates::BACK;
-    redLed.ledStatus = redLed.ledStates::OFF;
-    blueLed.ledStatus = blueLed.ledStates::ON;
-  }
-  if( Ps3.event.button_up.l1 )   /*-------------- Digital left trigger button event -------------*/
-  {
-    motor1.motorStatus = motor1.motorStates::STOP;
-    redLed.ledStatus = redLed.ledStates::ON;
-    blueLed.ledStatus = blueLed.ledStates::OFF;
-  }
-  if( Ps3.event.button_up.l2 )   /*-------------- Digital left trigger button event -------------*/
-  {
-    motor1.motorStatus = motor1.motorStates::STOP;
-    redLed.ledStatus = redLed.ledStates::ON;
-    blueLed.ledStatus = blueLed.ledStates::OFF;
-  }
-  
-  /* ============================================= Motor 2 events =============================================*/
-
-  if( Ps3.event.button_down.r1 )      /*------------- Digital right shoulder button event -------------*/
-  {
-    motor2.motorStatus = motor2.motorStates::FRONT;
-    redLed.ledStatus = redLed.ledStates::OFF;
-    blueLed.ledStatus = blueLed.ledStates::ON;
-  }
-  if( Ps3.event.button_down.r2 )      /*-------------- Digital right trigger button event -------------*/
-  {
-    motor2.motorStatus = motor2.motorStates::BACK;
-    redLed.ledStatus = redLed.ledStates::OFF;
-    blueLed.ledStatus = blueLed.ledStates::ON;
-  }
-  if( Ps3.event.button_up.r1 )  /*-------------- Digital right trigger button event -------------*/
-  {
-    motor2.motorStatus = motor2.motorStates::STOP;
-    redLed.ledStatus = redLed.ledStates::ON;
-    blueLed.ledStatus = blueLed.ledStates::OFF;
-  }
-
-  if(Ps3.event.button_up.r2)
-  {
-    motor2.motorStatus = motor2.motorStates::STOP;
-    redLed.ledStatus = redLed.ledStates::ON;
-    blueLed.ledStatus = blueLed.ledStates::OFF;
-  }
-
-  /*---------- Digital select/start/ps button events ---------*/
-  if( Ps3.event.button_down.select )
-  {
-    if(motor1.FLIPStatus == motor1.motorStates::UNFLIP)
+    if(stateCount == 1)
     {
-      motor1.FLIPStatus = motor1.motorStates::FLIP;
-      // //buzz.nonBlockToneOn();
-      debugln("FLIPPED");
+      Ps3.setPlayer(1);
+      driveStatus = driveStates::mode1;
     }
-    else
+    else if(stateCount == 2)
     {
-      motor1.FLIPStatus = motor1.motorStates::UNFLIP;
-      // //buzz.nonBlockToneOn();
-      debugln("UNFLIPPED");
+      Ps3.setPlayer(2);
+      driveStatus = driveStates::mode2;
     }
-    
-    delay(50);
   }
+
+  switch(driveStatus)
+  {
+    case driveStates::mode1:
+    driveMode1();
+    break;
+
+    case driveStates::mode2:
+    driveMode2();
+    break;
+
+    case driveStates::none:
+    Ps3.setPlayer(15);
+    break;
+  }
+
+  setSpeed();
 
   /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Motor State machine ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
   switch(motor1.motorStatus)
   {
     case motor1.motorStates::FRONT:
-    if(motor1.FLIPStatus == motor1.motorStates::UNFLIP)
-      motor1.front();
-    else
-      motor2.front();
+    motor1.front();
     break;
 
     case motor1.motorStates::BACK:
-    if(motor1.FLIPStatus == motor1.motorStates::UNFLIP)
-      motor1.back();
-    else
-      motor2.back();
+    motor1.back();
     break;
 
     case motor1.motorStates::ENABLE:
@@ -145,17 +68,11 @@ void notify()
   switch(motor2.motorStatus)
   {
     case motor2.motorStates::FRONT:
-    if(motor1.FLIPStatus == motor1.motorStates::UNFLIP)
-      motor2.front();
-    else
-      motor1.front();
+    motor2.front();
     break;
 
     case motor2.motorStates::BACK:
-    if(motor1.FLIPStatus == motor1.motorStates::UNFLIP)
-      motor2.back();
-    else
-      motor1.back();
+    motor2.back();
     break;
 
     case motor1.motorStates::ENABLE:
@@ -237,18 +154,7 @@ void setup()
   Ps3.attachOnConnect(onConnect);
   Ps3.begin("24:62:ab:dd:a1:d6");
 
-  motor1.begin();
-  motor1.enable();
-
-  motor2.begin();
-  motor2.enable();
-
-  redLed.begin();
-
-  buzz.begin();
-
-  blueLed.begin();
-  redLed.begin();
+  begin();
 
   debugln("Ready");
 }
@@ -257,16 +163,4 @@ void loop()
 {
   if(!Ps3.isConnected())  
     return;
-  
-  if(initOnce)
-  {
-    initOnce = false;
-    buzz.initBuzzer();
-    redLed.blinkTwice();
-    blueLed.blinkTwice();
-    // player = 2;
-    debug("Setting LEDs to player "); 
-    // Serial.println(player, DEC);
-    Ps3.setPlayer(player);
-  }
 }
