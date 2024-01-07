@@ -130,7 +130,5 @@ void buzzer::nonBlockToneInit()
 buzzer::~buzzer()
 {
   ledcDetach(this->buzzPin);
-  // {
-  //   debugln("buzzer object destroyed"); 
-  // }
+  debugln("buzzer object destroyed"); 
 }

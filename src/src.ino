@@ -6,127 +6,144 @@ void notify()
   //---------- Digital select/start/ps button events ---------
   if( Ps3.event.button_down.start )
   {
-    if(++stateCount == 3)
+    if(++stateCount == 5)
       stateCount = 1;
 
     if(stateCount == 1)
     {
       Ps3.setPlayer(1);
-      driveStatus = driveStates::mode1;
+      mode.driveStatus = mode.driveStates::mode1;
     }
     else if(stateCount == 2)
     {
       Ps3.setPlayer(2);
-      driveStatus = driveStates::mode2;
+      mode.driveStatus = mode.driveStates::mode2;
+    }
+    else if(stateCount == 3)
+    {
+      Ps3.setPlayer(3);
+      mode.driveStatus = mode.driveStates::mode3;
+    }
+    else if(stateCount == 4)
+    {
+      Ps3.setPlayer(4);
+      mode.driveStatus = mode.driveStates::mode4;
     }
   }
 
-  switch(driveStatus)
+  switch(mode.driveStatus)
   {
-    case driveStates::mode1:
-    driveMode1();
+    case mode.driveStates::mode1:
+    mode.driveMode1();             //Normal mode
     break;
 
-    case driveStates::mode2:
-    driveMode2();
+    case mode.driveStates::mode2:
+    mode.driveMode2();             //Speed adaptive mode
     break;
 
-    case driveStates::none:
-    Ps3.setPlayer(15);
+    case mode.driveStates::mode3:
+    mode.driveMode3();             //Performance mode
+    break;
+
+    case mode.driveStates::mode4:
+    mode.driveMode4();             //Performance mode
+    break;
+
+    case mode.driveStates::none:
+    mode.disconnectedBlink();
     break;
   }
 
-  setSpeed();
 
   /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Motor State machine ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-  switch(motor1.motorStatus)
+  switch(mode.motor1.motorStatus)
   {
-    case motor1.motorStates::FRONT:
-    motor1.front();
+    case mode.motor1.motorStates::FRONT:
+    mode.motor1.front();
     break;
 
-    case motor1.motorStates::BACK:
-    motor1.back();
+    case mode.motor1.motorStates::BACK:
+    mode.motor1.back();
     break;
 
-    case motor1.motorStates::ENABLE:
-    motor1.enable();
-    buzz.initBuzzer();
+    case mode.motor1.motorStates::ENABLE:
+    mode.motor1.enable();
+    mode.buzz.initBuzzer();
     break;
 
-    case motor1.motorStates::DISABLE:
-    motor1.disable();
-    buzz.deinitBuzzer();
+    case mode.motor1.motorStates::DISABLE:
+    mode.motor1.disable();
+    mode.buzz.deinitBuzzer();
     break;
 
-    case motor1.motorStates::STOP:
-    motor1.stop();
+    case mode.motor1.motorStates::STOP:
+    mode.motor1.stop();
     break;
   }
 
-  switch(motor2.motorStatus)
+  switch(mode.motor2.motorStatus)
   {
-    case motor2.motorStates::FRONT:
-    motor2.front();
+    case mode.motor2.motorStates::FRONT:
+    mode.motor2.front();
     break;
 
-    case motor2.motorStates::BACK:
-    motor2.back();
+    case mode.motor2.motorStates::BACK:
+    mode.motor2.back();
     break;
 
-    case motor1.motorStates::ENABLE:
-    motor2.enable();
+    case mode.motor1.motorStates::ENABLE:
+    mode.motor2.enable();
     break;
 
-    case motor1.motorStates::DISABLE:
-    motor2.disable();
+    case mode.motor1.motorStates::DISABLE:
+    mode.motor2.disable();
     break;
 
-    case motor2.motorStates::STOP:
-    motor2.stop();
+    case mode.motor2.motorStates::STOP:
+    mode.motor2.stop();
     break;
   }
 
   /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ REDLED State machine ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-  switch(redLed.ledStatus)
+  switch(mode.redLed.ledStatus)
   {
-    case redLed.ledStates::ON:
-    redLed.on();
+    case mode.redLed.ledStates::ON:
+    mode.redLed.on();
     break;
 
-    case redLed.ledStates::OFF:
-    redLed.off();
+    case mode.redLed.ledStates::OFF:
+    mode.redLed.off();
     break;
 
-    case redLed.ledStates::TOGGLE:
-    redLed.toggle();
+    case mode.redLed.ledStates::TOGGLE:
+    mode.redLed.toggle();
     break;
 
-    case redLed.ledStates::BLINKTWICE:
-    redLed.blinkTwice();
+    case mode.redLed.ledStates::BLINKTWICE:
+    mode.redLed.blinkTwice();
     break;
   }
 
   /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ BLUELED State machine ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-  switch(blueLed.ledStatus)
+  switch(mode.blueLed.ledStatus)
   {
-    case blueLed.ledStates::ON:
-    blueLed.on();
+    case mode.blueLed.ledStates::ON:
+    mode.blueLed.on();
     break;
 
-    case blueLed.ledStates::OFF:
-    blueLed.off();
+    case mode.blueLed.ledStates::OFF:
+    mode.blueLed.off();
     break;
 
-    case blueLed.ledStates::TOGGLE:
-    blueLed.toggle();
+    case mode.blueLed.ledStates::TOGGLE:
+    mode.blueLed.toggle();
     break;
 
-    case blueLed.ledStates::BLINKTWICE:
-    blueLed.blinkTwice();
+    case mode.blueLed.ledStates::BLINKTWICE:
+    mode.blueLed.blinkTwice();
     break;
   }
 
@@ -154,7 +171,7 @@ void setup()
   Ps3.attachOnConnect(onConnect);
   Ps3.begin("24:62:ab:dd:a1:d6");
 
-  begin();
+  mode.begin();
 
   debugln("Ready");
 }

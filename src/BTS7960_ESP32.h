@@ -95,9 +95,9 @@ R_IS(R_IS),                //Alarm pin
 ID(ID),                    //for seial monitor display
 debugStatus(debugStatus)
 {
-  speed = 80;
+  speed = 70;
   version = "1.0.0";
-  oldMotorSpeed = 80;
+  oldMotorSpeed = 70;
   changeSpeedInc = 60;
   changeSpeedDec = 50;
 }
@@ -152,6 +152,7 @@ void BTS7960_ESP32::front()
 {
   ledcWrite(this->L_PWM,this->DEFAULTSPEED);
   ledcWrite(this->R_PWM,this->speed);
+  delayMicroseconds(100);
   
   if(this->debugStatus) Serial.println("Motor "+(String)ID+" FRONT: "+this->speed);
 }
@@ -160,6 +161,7 @@ void BTS7960_ESP32::back()
 {
   ledcWrite(this->L_PWM,this->speed);
   ledcWrite(this->R_PWM,this->DEFAULTSPEED);
+  delayMicroseconds(100);
   
   if(this->debugStatus) Serial.println("Motor "+(String)ID+" BACK: "+this->speed);
 }
