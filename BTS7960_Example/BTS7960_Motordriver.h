@@ -33,9 +33,6 @@ class BTS7960_ESP32
 
   //pwm variable to control the speed of motor
   uint8_t speed;
-  int deviation;
-  uint8_t oldMotorSpeed;
-  uint8_t changeSpeedInc, changeSpeedDec;
   /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++MOTOR STATES++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
   enum motorStates : uint8_t
@@ -96,11 +93,8 @@ R_IS(R_IS),                //Alarm pin
 ID(ID),                    //for seial monitor display
 debugStatus(debugStatus)
 {
-  speed = 70;
   version = "1.0.0";
-  oldMotorSpeed = 70;
-  changeSpeedInc = 60;
-  changeSpeedDec = 50;
+  printInfo();
 }
 
 void BTS7960_ESP32::begin()
