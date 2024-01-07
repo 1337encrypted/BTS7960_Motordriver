@@ -1,4 +1,4 @@
-#include <BTS7960_Motordriver.h>
+#include "BTS7960_Motordriver.h"
 
 //Motor PWM properties
 const uint32_t freq = 10000;
@@ -13,7 +13,7 @@ constexpr uint8_t L_EN1 = 14;
 constexpr uint8_t R_IS1 = -1;        //Alarm pin
 constexpr uint8_t L_IS1 = -1;        //Alarm pin
 
-constexpr MOTORDEBUG=true;
+constexpr bool MOTORDEBUG=true;
 
 BTS7960_ESP32 motor1(L_EN1, R_EN1, LPWM1, RPWM1, freq, resolution, L_IS1, R_IS1, leftMotorsId, MOTORDEBUG);       //Create an object of class motor1
 
