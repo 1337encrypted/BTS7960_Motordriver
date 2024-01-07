@@ -1,128 +1,119 @@
-#include "BTS7960_Motordriver.h"
+//Static variables initilisation
+String BTS7960_ESP32::version="";
+
 //Default constructor
-BTS7960::BTS7960()
-{
-    //Motor driver 1 pin definitions.
-    this->L_EN = 2;
-    this->R_EN = 4;
-    this->L_PWM = 5;        //pin 5 has PWM frequency of 980Hz
-    this->R_PWM = 6;        //pin 6 has PWM frequency of 980Hz
-//    this->L_IS = 7;         //Alarm pin
-//    this->R_IS = 8;         //Alarm pin
-
-    //Set the global pwm variable to 255
-    this->pwm = 255;
-}
-
-//Parametrised constructor with 2 parameters where R_EN and L_EN are hard wired to 3.3v to 5v.
-BTS7960::BTS7960(uint8_t L_PWM, uint8_t R_PWM)
-{
-    //Motor driver 1 pin definitions
-    this->L_PWM = L_PWM;    //pin 5 has PWM frequency of 980Hz
-    this->R_PWM = R_PWM;    //pin 6 has PWM frequency of 980Hz
-
-    //Set the global pwm variable to 255
-    this->pwm = 255;
-}
-
-//Parametrised constructor with 4 parameters, this disables L_IS and R_IS.
-BTS7960::BTS7960(uint8_t L_EN, uint8_t R_EN, uint8_t L_PWM, uint8_t R_PWM)
-{
-    //Motor driver 1 pin definitions
-    this->L_EN = L_EN;
-    this->R_EN = R_EN;
-    this->L_PWM = L_PWM;    //pin 5 has PWM frequency of 980Hz
-    this->R_PWM = R_PWM;    //pin 6 has PWM frequency of 980Hz
-
-    //Set the global pwm variable to 255
-    this->pwm = 255;
-}
+BTS7960_ESP32::BTS7960_ESP32(){}
 
 //Parametrised constructor with 6 parameters (still need to work on it, avoid it for right now)
-BTS7960::BTS7960(uint8_t L_EN, uint8_t R_EN, uint8_t L_PWM, uint8_t R_PWM, uint8_t L_IS, uint8_t R_IS)
+BTS7960_ESP32::BTS7960_ESP32(const uint8_t& L_EN, const uint8_t& R_EN, const uint8_t& L_PWM, const uint8_t& R_PWM, const uint32_t& freq, const uint8_t& resolution, const uint8_t& L_IS, const uint8_t& R_IS, const uint8_t& ID, const bool& debugStatus) :
+L_EN(L_EN),
+R_EN(R_EN),
+L_PWM(L_PWM),              //pin 5 has PWM frequency of 980Hz
+R_PWM(R_PWM),              //pin 6 has PWM frequency of 980Hz
+freq(freq),                //frequency set to 20 khz
+resolution(resolution),    //12 bit resolution
+L_IS(L_IS),                //Alarm pin
+R_IS(R_IS),                //Alarm pin
+ID(ID),                    //for seial monitor display
+debugStatus(debugStatus)
 {
-    //Motor driver 1 pin definitions
-    this->L_EN = L_EN;
-    this->R_EN = R_EN;
-    this->L_PWM = L_PWM;    //pin 5 has PWM frequency of 980Hz
-    this->R_PWM = R_PWM;    //pin 6 has PWM frequency of 980Hz
-//    this->L_IS = L_IS;      //Alarm pin
-//    this->R_IS = R_IS;      //Alarm pin
-
-    //Set the global pwm variable to 255
-    this->pwm = 255;
+  speed = 70;
+  version = "1.0.0";
+  oldMotorSpeed = 70;
+  changeSpeedInc = 60;
+  changeSpeedDec = 50;
 }
 
-void BTS7960::begin()
+void BTS7960_ESP32::begin()
 {
-    //Motor driver enable pins set as output and high
-    pinMode(R_EN, OUTPUT);
-    pinMode(L_EN, OUTPUT);
+  if(this->L_EN > 0)  pinMode(this->R_EN, OUTPUT);    //Motor driver enable pins set as output and high
+  if(this->R_EN > 0)  pinMode(this->L_EN, OUTPUT);
+  // if(this->L_PWM > 0) pinMode(this->L_PWM, OUTPUT);   //PWM is for direction and pwm
+  // if(this->R_PWM > 0) pinMode(this->R_PWM, OUTPUT);
+  if(this->R_IS > 0) pinMode(this->R_IS, INPUT);     //R_IS and L_IS alarm pins
+  if(this->L_IS > 0)  pinMode(this->L_IS, INPUT);
 
-    //PWM is for direction and pwm
-    pinMode(R_PWM, OUTPUT);
-    pinMode(L_PWM, OUTPUT);
+  // Configure PWM channels
+  // ledcSetup(this->PWMChannel1, this->freq, this->resolution);  /*PWMChannel, 20 kHz frequency, 12-bit resolution*/
+  // ledcSetup(this->PWMChannel2, this->freq, this->resolution);  /*PWMChannel, 20 kHz frequency, 12-bit resolution*/
+
+  // Attach PWM channels to pins
+  ledcAttach(this->L_PWM, this->freq, this->resolution);
+  ledcAttach(this->R_PWM, this->freq, this->resolution);
 }
 
-void BTS7960::enable()
+void BTS7960_ESP32::enable()
 {
-    //Setting the BTS7960 enable pins high
-    digitalWrite(R_EN, HIGH);
-    digitalWrite(L_EN, HIGH);
+  //Setting the BTS7960_ESP32 enable pins high
+  digitalWrite(this->R_EN, HIGH);
+  digitalWrite(this->L_EN, HIGH);
+
+  if(this->debugStatus) Serial.println((String)this->ID+" initilized and enabled");
+  return;
 }
 
-void BTS7960::disable()
+void BTS7960_ESP32::disable()
 {
-    //Setting the BTS7960 enable pins high
-    digitalWrite(R_EN, LOW);
-    digitalWrite(L_EN, LOW);
+  //Setting the BTS7960_ESP32 enable pins low
+  digitalWrite(this->R_EN, LOW);
+  digitalWrite(this->L_EN, LOW);
+
+  if(this->debugStatus) Serial.println((String)this->ID+" motor driver disabled");
+  return;
 }
 
-void BTS7960::stop()
+void BTS7960_ESP32::stop()
 {
-    analogWrite(R_PWM,0);
-    analogWrite(L_PWM,0);
-    
-    //R_EN is HIGH then set it low, else dont
-    if(digitalRead(R_EN))
-    {
-        disable();
-        debugln("disbale");
-    }
+  ledcWrite(this->L_PWM,this->DEFAULTSPEED);
+  ledcWrite(this->R_PWM,this->DEFAULTSPEED);
+  
+  if(this->debugStatus) Serial.println("Motor "+(String)ID+" STOP: "+this->DEFAULTSPEED);
 }
 
-void BTS7960::front()
+void BTS7960_ESP32::front()
 {
-    //R_EN is LOW then set it high, else dont
-    if(!digitalRead(R_EN))
-    {
-        enable();
-        debugln("enable");
-    }
-    
-    analogWrite(L_PWM,0);
-    //delayMicroseconds(100);
-    analogWrite(R_PWM,pwm);
-    //delayMicroseconds(100);
+  ledcWrite(this->L_PWM,this->DEFAULTSPEED);
+  ledcWrite(this->R_PWM,this->speed);
+  delayMicroseconds(100);
+  
+  if(this->debugStatus) Serial.println("Motor "+(String)ID+" FRONT: "+this->speed);
 }
 
-void BTS7960::back()
+void BTS7960_ESP32::back()
 {
-    //R_EN is LOW then set it high, else dont
-    if(!digitalRead(R_EN))
-    {
-        enable();
-        debugln("enable");
-    }
-    
-    analogWrite(L_PWM,pwm);
-    //delayMicroseconds(100);
-    analogWrite(R_PWM,0);
-    //delayMicroseconds(100);
+  ledcWrite(this->L_PWM,this->speed);
+  ledcWrite(this->R_PWM,this->DEFAULTSPEED);
+  delayMicroseconds(100);
+  
+  if(this->debugStatus) Serial.println("Motor "+(String)ID+" BACK: "+this->speed);
+}
+
+void BTS7960_ESP32::alarm()
+{
+  if(digitalRead(L_IS) || digitalRead(R_IS))
+  {
+      disable();
+      if(this->debugStatus) Serial.println("High current alarm");
+  }  
+}
+
+void BTS7960_ESP32::printInfo()
+{
+  Serial.println();
+  Serial.println("BTS7960_ESP32 Motordriver library");
+  Serial.println("Library version:");
+  Serial.println(version);
+  Serial.println("Yash Herekar 2023");
+  
+  delay(1000);
+  return;
 }
 
 //Destructor
-BTS7960::~BTS7960()
+BTS7960_ESP32::~BTS7960_ESP32()
 {
-  debugln("motor object destroyed");
+  ledcDetach(this->L_PWM);
+  ledcDetach(this->R_PWM);
+  if(this->debugStatus) Serial.println("motor object destroyed");
+  return;
 }
