@@ -1,7 +1,7 @@
 #include "BTS7960_Motordriver.h"
 
 //Motor PWM properties
-const uint32_t freq = 10000;
+const uint32_t frequency = 10000;
 const uint8_t resolution = 8;
 
 //BTS7960 motor driver 2 pin definitions
@@ -15,7 +15,7 @@ constexpr uint8_t L_IS1 = -1;        //Alarm pin
 
 constexpr bool MOTORDEBUG=true;
 
-BTS7960_ESP32 motor1(L_EN1, R_EN1, LPWM1, RPWM1, freq, resolution, L_IS1, R_IS1, leftMotorsId, MOTORDEBUG);       //Create an object of class motor1
+BTS7960_ESP32 motor1(L_EN1, R_EN1, LPWM1, RPWM1, frequency, resolution, L_IS1, R_IS1, leftMotorsId, MOTORDEBUG);       //Create an object of class motor1
 
 void setup() {
   Serial.begin(9600);                       //begin the serial monitor for output
