@@ -179,5 +179,4 @@ void setup()
 void loop()
 {
   if(!Ps3.isConnected())  
-    return;
 }

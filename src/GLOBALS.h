@@ -6,11 +6,8 @@
 #include "DRIVESYSTEM.h"
 #include "CONFIG.h"
 
-// Miscellaneous variables
-bool initOnce = true;
-
 //Motor PWM properties
-const uint32_t freq = 10000;
+const uint32_t frequency = 10000;
 const uint8_t resolution = 8;
 
 //BTS7960 motor driver 2 pin definitions
@@ -43,7 +40,7 @@ uint8_t stateCount = 0;
 const String redLedId = "Red Led";
 constexpr uint8_t redLedPin = 17;
 
-// //LED2
+//LED2
 const String blueLedId = "Blue Led";
 constexpr uint8_t blueLedPin = 2;
 
@@ -51,17 +48,16 @@ constexpr uint8_t blueLedPin = 2;
 constexpr uint8_t buzzId = 1;
 constexpr uint8_t buzzPin = 21; //Active buzzer use 100 ohms resistor
 constexpr uint8_t resolutionBuzz = 8;
-constexpr uint32_t freqBuzz = 5000;
+constexpr uint32_t frequencyBuzz = 5000;
 
 /*==================================================Object declaration===================================================*/  
 // Create iBus Object
-BTS7960_ESP32 motor1(L_EN1, R_EN1, LPWM1, RPWM1, freq, resolution, L_IS1, R_IS1, leftMotorsId, MOTORDEBUG);       //Create an object of class motor1
-BTS7960_ESP32 motor2(L_EN2, R_EN2, RPWM2, LPWM2, freq, resolution, L_IS2, R_IS2, rightMotorsId, MOTORDEBUG);      //Create an object of class motor2 should have been LPWM2, RPWM2
-led redLed(redLedPin, freq, resolution, redLedId, LEDDEBUG);                                                      //Create object for red led
-led blueLed(blueLedPin, freq, resolution, blueLedId, LEDDEBUG);                                                   //Create object for blue led
-buzzer buzz(buzzId, buzzPin, resolutionBuzz, freqBuzz, BUZZERDEBUG);                                              //Create object for buzzer
-// Drive System object
-driveMode mode(motor1, motor2, redLed, blueLed, buzz, player, battery);
+BTS7960_ESP32 motor1(L_EN1, R_EN1, LPWM1, RPWM1, frequency, resolution, L_IS1, R_IS1, leftMotorsId, MOTORDEBUG);     //Create an object of class motor1
+BTS7960_ESP32 motor2(L_EN2, R_EN2, RPWM2, LPWM2, frequency, resolution, L_IS2, R_IS2, rightMotorsId, MOTORDEBUG);    //Create an object of class motor2 should have been LPWM2, RPWM2
+led redLed(redLedPin, frequency, resolution, redLedId, LEDDEBUG);                                                    //Create object for red led
+led blueLed(blueLedPin, frequency, resolution, blueLedId, LEDDEBUG);                                                 //Create object for blue led
+buzzer buzz(buzzId, buzzPin, resolutionBuzz, frequencyBuzz, BUZZERDEBUG);                                            //Create object for buzzer
+driveMode mode(motor1, motor2, redLed, blueLed, buzz, player, battery);                                              // Drive System object
 /*==================================================Function section========================================================*/
 
 void onConnect()

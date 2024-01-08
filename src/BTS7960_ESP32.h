@@ -33,7 +33,7 @@ class BTS7960_ESP32
 
   //pwm variable to control the speed of motor
   uint8_t speed;
-  int deviation;
+  int8_t deviation;
   uint8_t oldMotorSpeed;
   uint8_t changeSpeedInc, changeSpeedDec;
   /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++MOTOR STATES++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -76,7 +76,6 @@ class BTS7960_ESP32
 };
 
 //Static variables initilisation
-
 String BTS7960_ESP32::version="";
 
 //Default constructor
