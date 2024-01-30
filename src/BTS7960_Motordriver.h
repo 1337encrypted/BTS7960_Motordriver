@@ -56,8 +56,10 @@ class BTS7960_ESP32
     UNFLIP = 'U'
   };
   motorStates motorStatus = motorStates::STOPALL;                        //State variable set to STOP initially
+  motorStates prevMotorStatus = motorStatus;                             //State variable set to STOP initially
   // motorStates ENABLEStatus = motorStates::ENABLE;                     //Motor Enable state
   // motorStates FLIPStatus = motorStates::UNFLIP;                       //Motor FLIP state
+
 
   
   /*=============================================Function prototyping section=====================================================*/
