@@ -1,16 +1,18 @@
+# pragma once 
+
 #include <Ps3Controller.h>
 #include "BTS7960_ESP32.h"
 #include "LED.h"
 #include "BUZZER_ESP32.h"
 #include "CONFIG.h"
 
-# pragma once 
 
 class driveMode
 {
+  private:
+  uint8_t player;
+
   public:
-  uint8_t player = 2;
-  uint8_t battery = 0;
 
   // Create iBus Object
   BTS7960_ESP32 motor1;      //Create an object of class motor1
@@ -18,7 +20,7 @@ class driveMode
   led redLed;                //Create object for red led
   led blueLed;               //Create object for blue led
   buzzer buzz;               //Create object for buzzer
-
+  
   enum driveStates : uint8_t
   {
     mode1,
@@ -30,8 +32,9 @@ class driveMode
   driveStates driveStatus = driveStates::none;
 
 
-  driveMode(const BTS7960_ESP32 &, const BTS7960_ESP32 &, const led &, const led &, const buzzer &, const uint8_t &, const uint8_t &);
+  driveMode(const BTS7960_ESP32 &, const BTS7960_ESP32 &, const led &, const led &, const buzzer &, const uint8_t &);
   void begin();
+  void loop();
   void driveMode1();
   void driveMode2();
   void driveMode3();
@@ -40,14 +43,13 @@ class driveMode
   // virtual ~driveMode(){}
 };
 
-driveMode::driveMode(const BTS7960_ESP32& motor1, const BTS7960_ESP32& motor2, const led& redLed, const led& blueLed, const buzzer& buzz, const uint8_t& player, const uint8_t& battery) : 
+driveMode::driveMode(const BTS7960_ESP32& motor1, const BTS7960_ESP32& motor2, const led& redLed, const led& blueLed, const buzzer& buzz, const uint8_t& player) : 
 motor1(motor1),
 motor2(motor2),
 redLed(redLed),
 blueLed(blueLed),
 buzz(buzz),
-player(player),
-battery(battery)
+player(player)
 {}
  
 void driveMode::begin()
@@ -64,12 +66,36 @@ void driveMode::begin()
   buzz.begin();
 
   Ps3.setPlayer(player);
+}
 
-  debug("Setting LEDs to player "); 
+void driveMode::loop()
+{
+  switch(this->driveStatus)
+  {
+    case driveStates::mode1:
+    driveMode1();             //Normal mode
+    break;
+
+    case driveStates::mode2:
+    driveMode2();             //Speed adaptive mode
+    break;
+
+    case driveStates::mode3:
+    driveMode3();             //Performance mode
+    break;
+
+    case driveStates::mode4:
+    driveMode4();             //Performance mode
+    break;
+
+    case driveStates::none:
+    disconnectedBlink();
+    break;
+  }
 }
 
 
-void driveMode::driveMode1() 
+void driveMode::driveMode4() 
 {
   if( abs(Ps3.event.analog_changed.button.cross) > 100)
   {
@@ -197,7 +223,7 @@ void driveMode::driveMode2()
     motor1.speed = motor1.oldMotorSpeed - motor1.deviation;
   }
 
-  if( Ps3.event.button_down.r2 )      /*------------- Digital right shoulder button event -------------*/
+  if( Ps3.event.button_down.l2 )      /*------------- Digital left shoulder button event -------------*/
   {
     motor1.motorStatus = motor1.motorStates::BACK;
     motor2.motorStatus = motor2.motorStates::BACK;
@@ -205,7 +231,7 @@ void driveMode::driveMode2()
     blueLed.ledStatus = blueLed.ledStates::ON;
   }
 
-  if( Ps3.event.button_up.r2 )      /*------------- Digital right shoulder button event -------------*/
+  if( Ps3.event.button_up.l2 )      /*------------- Digital left shoulder button event -------------*/
   {
     motor1.motorStatus = motor1.motorStates::STOP;
     motor2.motorStatus = motor2.motorStates::STOP;
@@ -240,7 +266,7 @@ void driveMode::driveMode2()
   // if( Ps3.event.button_up.down )
   //     Serial.println("Released the down button");
 
-  if( Ps3.event.button_down.right )
+  if( Ps3.data.analog.button.right > 5 )
   {
     // Serial.println("Started pressing the right button");
     motor1.motorStatus = motor1.motorStates::FRONT;
@@ -253,7 +279,7 @@ void driveMode::driveMode2()
     motor2.motorStatus = motor2.motorStates::STOP;
   }       
 
-  if( Ps3.event.button_down.left )
+  if( Ps3.data.analog.button.left > 5 )
   {
     // Serial.println("Started pressing the left button");
     motor2.motorStatus = motor2.motorStates::FRONT;
@@ -312,7 +338,7 @@ void driveMode::driveMode3()
     motor1.speed = motor1.oldMotorSpeed - motor1.deviation;
   }
 
-  if( Ps3.event.button_down.r2 )      /*------------- Digital right shoulder button event -------------*/
+  if( Ps3.event.button_down.l2 )      /*------------- Digital left shoulder button event -------------*/
   {
     motor1.motorStatus = motor1.motorStates::BACK;
     motor2.motorStatus = motor2.motorStates::BACK;
@@ -320,7 +346,7 @@ void driveMode::driveMode3()
     blueLed.ledStatus = blueLed.ledStates::ON;
   }
 
-  if( Ps3.event.button_up.r2 )      /*------------- Digital right shoulder button event -------------*/
+  if( Ps3.event.button_up.l2 )      /*------------- Digital left shoulder button event -------------*/
   {
     motor1.motorStatus = motor1.motorStates::STOP;
     motor2.motorStatus = motor2.motorStates::STOP;
@@ -355,7 +381,7 @@ void driveMode::driveMode3()
   // if( Ps3.event.button_up.down )
   //     Serial.println("Released the down button");
 
-  if( Ps3.event.button_down.right )
+  if( Ps3.data.analog.button.right > 5 )
   {
     // Serial.println("Started pressing the right button");
     motor1.motorStatus = motor1.motorStates::FRONT;
@@ -368,7 +394,7 @@ void driveMode::driveMode3()
     motor2.motorStatus = motor2.motorStates::STOP;
   }       
 
-  if( Ps3.event.button_down.left )
+  if( Ps3.data.analog.button.left > 5 )
   {
     // Serial.println("Started pressing the left button");
     motor2.motorStatus = motor2.motorStates::FRONT;
@@ -383,73 +409,122 @@ void driveMode::driveMode3()
   } 
 }
 
-void driveMode::driveMode4()
+void driveMode::driveMode1()
 {    
+
   if( Ps3.event.button_up.r1 )
   {
     motor1.speed = motor2.speed = 0;
     motor1.motorStatus = motor1.motorStates::STOP;
     motor2.motorStatus = motor2.motorStates::STOP;
-  }   
+    redLed.ledStatus = redLed.ledStates::ON;
+    blueLed.ledStatus = blueLed.ledStates::OFF;
+  }
 
+  if( Ps3.data.analog.button.l1 > 5 )
+  {
+    motor1.speed = motor2.speed = Ps3.data.analog.button.l1;
+    motor1.motorStatus = motor1.motorStates::FRONT;
+    motor2.motorStatus = motor2.motorStates::FRONT;
+    redLed.ledStatus = redLed.ledStates::OFF;
+    blueLed.ledStatus = blueLed.ledStates::ON;
+  }
+
+  if( Ps3.event.button_up.l1 )
+  {
+    motor1.speed = motor2.speed = 0;
+    motor1.motorStatus = motor1.motorStates::STOP;
+    motor2.motorStatus = motor2.motorStates::STOP;
+    redLed.ledStatus = redLed.ledStates::ON;
+    blueLed.ledStatus = blueLed.ledStates::OFF;
+  }   
   if( Ps3.data.analog.button.r1 > 5)
   {
     motor1.speed = motor2.speed = Ps3.data.analog.button.r1;
     motor1.motorStatus = motor1.motorStates::BACK;
     motor2.motorStatus = motor2.motorStates::BACK;
+    redLed.ledStatus = redLed.ledStates::OFF;
+    blueLed.ledStatus = blueLed.ledStates::ON;
   }
 
-  if( Ps3.event.button_up.r2 )
-  {
-    motor1.speed = motor2.speed = 0;
-    motor1.motorStatus = motor1.motorStates::STOP;
-    motor2.motorStatus = motor2.motorStates::STOP;
-  }
+  //   //---------------- Analog stick value events ---------------
+  // if(Ps3.data.analog.stick.ry > 10 ) //move Right, upper limit = 127
+  // {
+  //   motor2.speed = motor2.speed = static_cast<int8_t>((255 / 127.0) * Ps3.data.analog.stick.ry); 
+  //   motor1.motorStatus = motor1.motorStates::BACK;
+  //   motor2.motorStatus = motor2.motorStates::BACK;
+  //   redLed.ledStatus = redLed.ledStates::ON;
+  //   blueLed.ledStatus = blueLed.ledStates::OFF;
 
-  if( Ps3.data.analog.button.r2 > 5 )
-  {
-    motor1.speed = motor2.speed = Ps3.data.analog.button.r2;
-    motor1.motorStatus = motor1.motorStates::FRONT;
-    motor2.motorStatus = motor2.motorStates::FRONT;
-  }
+  // }
+
+  // else if(Ps3.data.analog.stick.ry < -10 ) //move left, upper limit = -128
+  // {
+  //   motor2.speed = motor2.speed = static_cast<int8_t>((-255 / 128.0) * Ps3.data.analog.stick.ry);
+
+  //   motor1.motorStatus = motor1.motorStates::FRONT;
+  //   motor2.motorStatus = motor2.motorStates::FRONT;
+  //   redLed.ledStatus = redLed.ledStates::OFF;
+  //   blueLed.ledStatus = blueLed.ledStates::ON;
+  // }
+
+  // else
+  // {
+  //   // motor2.speed = motor2.speed = static_cast<int8_t>((-255 / 128.0) * Ps3.data.analog.stick.ry);
+
+  //   motor1.motorStatus = motor1.motorStates::STOP;
+  //   motor2.motorStatus = motor2.motorStates::STOP;
+  //   redLed.ledStatus = redLed.ledStates::OFF;
+  //   blueLed.ledStatus = blueLed.ledStates::ON;
+  // }
 
   //---------------- Analog stick value events ---------------
-  if(Ps3.data.analog.stick.lx > 2 ) //move Right, upper limit = 127
+  if(Ps3.data.analog.stick.lx > 5 ) //move Right, upper limit = 127
   {
     motor2.deviation = static_cast<int8_t>(motor2.speed / 127.0 * Ps3.data.analog.stick.lx);
     motor2.speed = motor2.speed - motor2.deviation;
   }
 
-  if(Ps3.data.analog.stick.lx < -2 ) //move left, upper limit = -128
+  if(Ps3.data.analog.stick.lx < -5 ) //move left, upper limit = -128
   {
     motor1.deviation = static_cast<int8_t>(-(motor1.speed) / 128.0 * Ps3.data.analog.stick.lx);
     motor1.speed = motor1.speed - motor1.deviation;
   }
 
-  if( Ps3.event.button_down.right )
-  {
-    motor1.speed = 127;
-    motor1.motorStatus = motor1.motorStates::FRONT;
-    motor2.motorStatus = motor2.motorStates::BACK;
-  }
-  if( Ps3.event.button_up.right )
-  {
-    motor1.motorStatus = motor1.motorStates::STOP;
-    motor2.motorStatus = motor2.motorStates::STOP;
-  }       
+      /* Analog D pad button events */
 
-  if( Ps3.event.button_down.left )
-  {
-    motor1.speed = 127;
-    motor2.motorStatus = motor2.motorStates::FRONT;
-    motor1.motorStatus = motor1.motorStates::BACK;
-  }
+//   if( Ps3.data.analog.button.right > 5 )
+//   {
+//     motor1.speed = 127;
+//     motor1.motorStatus = motor1.motorStates::FRONT;
+//     motor2.motorStatus = motor2.motorStates::BACK;
+//     redLed.ledStatus = redLed.ledStates::OFF;
+//     blueLed.ledStatus = blueLed.ledStates::ON;
+//   }
+//   if( Ps3.event.button_up.right )
+//   {
+//     motor1.motorStatus = motor1.motorStates::STOP;
+//     motor2.motorStatus = motor2.motorStates::STOP;
+//     redLed.ledStatus = redLed.ledStates::ON;
+//     blueLed.ledStatus = blueLed.ledStates::OFF;
+//   }       
 
-  if( Ps3.event.button_up.left )
-  {
-    motor1.motorStatus = motor1.motorStates::STOP;
-    motor2.motorStatus = motor2.motorStates::STOP;
-  } 
+//   if( Ps3.data.analog.button.left > 5 )
+//   {
+//     motor1.speed = 127;
+//     motor2.motorStatus = motor2.motorStates::FRONT;
+//     motor1.motorStatus = motor1.motorStates::BACK;
+//     redLed.ledStatus = redLed.ledStates::OFF;
+//     blueLed.ledStatus = blueLed.ledStates::ON;
+//   }
+
+//   if( Ps3.event.button_up.left )
+//   {
+//     motor1.motorStatus = motor1.motorStates::STOP;
+//     motor2.motorStatus = motor2.motorStates::STOP;
+//     redLed.ledStatus = redLed.ledStates::ON;
+//     blueLed.ledStatus = blueLed.ledStates::OFF;
+//   } 
 }
 
 void driveMode::disconnectedBlink()

@@ -1,5 +1,27 @@
-// #include "DRIVESYSTEM.h"
+#pragma once 
+
+/*
+Pins used
+blueLedPin = 2;
+L_EN2 = 4;
+LPWM2 = 5; 
+L_EN1 = 14;
+RPWM2 = 15; 
+R_EN2 = 16;
+redLedPin = 17;
+buzzPin = 18;
+R_EN1 = 25;  
+RPWM1 = 26;
+LPWM1 = 27;
+
+Pins Available
+
+*/
+
 #include <Ps3Controller.h>
+#include <Wire.h>
+// #include <U8g2lib.h>
+#include "MENU.h"
 #include "BTS7960_ESP32.h"
 #include "LED.h"
 #include "BUZZER_ESP32.h"
@@ -11,25 +33,25 @@ const uint32_t frequency = 10000;
 const uint8_t resolution = 8;
 
 //BTS7960 motor driver 2 pin definitions
-constexpr uint8_t leftMotorsId = 1;
-constexpr uint8_t RPWM1 = 26;
-constexpr uint8_t LPWM1 = 27;                   
-constexpr uint8_t R_EN1 = 25;  
-constexpr uint8_t L_EN1 = 14;
-constexpr uint8_t R_IS1 = -1;        //Alarm pin
-constexpr uint8_t L_IS1 = -1;        //Alarm pin
+constexpr int8_t leftMotorsId = 1;
+constexpr int8_t RPWM1 = 26;
+constexpr int8_t LPWM1 = 27;                   
+constexpr int8_t R_EN1 = 25;  
+constexpr int8_t L_EN1 = 14;
+constexpr int8_t R_IS1 = -1;        //Alarm pin
+constexpr int8_t L_IS1 = -1;        //Alarm pin
 
 //BTS7960 motor driver 2 pin definitions
-constexpr uint8_t rightMotorsId = 2;
-constexpr uint8_t RPWM2 = 15;         
-constexpr uint8_t LPWM2 = 5;          
-constexpr uint8_t R_EN2 = 16;
-constexpr uint8_t L_EN2 = 4;
-constexpr uint8_t R_IS2 = -1;        //Alarm pin
-constexpr uint8_t L_IS2 = -1;        //Alarm pin 
+constexpr int8_t rightMotorsId = 2;
+constexpr int8_t RPWM2 = 15;         
+constexpr int8_t LPWM2 = 5;          
+constexpr int8_t R_EN2 = 16;
+constexpr int8_t L_EN2 = 4;
+constexpr int8_t R_IS2 = -1;        //Alarm pin
+constexpr int8_t L_IS2 = -1;        //Alarm pin 
 
 //PS3 variables
-uint8_t player = 2;
+uint8_t player = 0;
 uint8_t battery = 0;
 uint8_t stateCount = 0;
 
@@ -38,15 +60,15 @@ uint8_t stateCount = 0;
 
 //LED1
 const String redLedId = "Red Led";
-constexpr uint8_t redLedPin = 17;
+constexpr int8_t redLedPin = 17;
 
 //LED2
 const String blueLedId = "Blue Led";
-constexpr uint8_t blueLedPin = 2;
+constexpr int8_t blueLedPin = 2;
 
 //Buzzer definition section
-constexpr uint8_t buzzId = 1;
-constexpr uint8_t buzzPin = 21; //Active buzzer use 100 ohms resistor
+constexpr int8_t buzzId = 1;
+constexpr int8_t buzzPin = 18; //Active buzzer use 100 ohms resistor
 constexpr uint8_t resolutionBuzz = 8;
 constexpr uint32_t frequencyBuzz = 5000;
 
@@ -57,10 +79,5 @@ BTS7960_ESP32 motor2(L_EN2, R_EN2, RPWM2, LPWM2, frequency, resolution, L_IS2, R
 led redLed(redLedPin, frequency, resolution, redLedId, LEDDEBUG);                                                    //Create object for red led
 led blueLed(blueLedPin, frequency, resolution, blueLedId, LEDDEBUG);                                                 //Create object for blue led
 buzzer buzz(buzzId, buzzPin, resolutionBuzz, frequencyBuzz, BUZZERDEBUG);                                            //Create object for buzzer
-driveMode mode(motor1, motor2, redLed, blueLed, buzz, player, battery);                                              // Drive System object
+driveMode mode(motor1, motor2, redLed, blueLed, buzz, player);                                                       // Drive System object
 /*==================================================Function section========================================================*/
-
-void onConnect()
-{
-  debugln("Connected.");
-}

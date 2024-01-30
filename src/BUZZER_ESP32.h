@@ -1,30 +1,29 @@
+#pragma once
+
 /*Cannot create a .cpp file as inline prototypes need the function to be present in the same file as they are defined*/
 #include "CONFIG.h"
 
-#pragma once
-
 class buzzer {
 private:
-    uint8_t buzzId;
-    uint8_t buzzPin;
-    uint8_t resolution;
-    // uint8_t PWMChannel;
-    bool debugStatus;
-    uint32_t frequency;
-    uint8_t ledTimer;
+  int8_t buzzId;
+  int8_t buzzPin;
+  uint8_t resolution;
+  bool debugStatus;
+  uint32_t frequency;
+  uint8_t ledTimer;
 
 public:
-    inline buzzer(const uint8_t& = -1, const uint8_t& = -1, const uint8_t& = 8, const uint32_t& = 5000, const bool& = false) __attribute__((always_inline));
-    inline void begin() __attribute__((always_inline));
-    inline ~buzzer() __attribute__((always_inline));
-    inline void initBuzzer() __attribute__((always_inline));
-    inline void deinitBuzzer() __attribute__((always_inline));
-    inline void alarm() __attribute__((always_inline));
-    inline void nonBlockToneOn() __attribute__((always_inline));
-    inline void nonBlockToneInit() __attribute__((always_inline));
+  inline buzzer(const int8_t& = -1, const int8_t& = -1, const uint8_t& = 8, const uint32_t& = 5000, const bool& = false) __attribute__((always_inline));
+  inline void begin() __attribute__((always_inline));
+  inline ~buzzer() __attribute__((always_inline));
+  inline void initBuzzer() __attribute__((always_inline));
+  inline void deinitBuzzer() __attribute__((always_inline));
+  inline void alarm() __attribute__((always_inline));
+  inline void nonBlockToneOn() __attribute__((always_inline));
+  inline void nonBlockToneInit() __attribute__((always_inline));
 };
 
-buzzer::buzzer(const uint8_t& buzzId, const uint8_t& buzzPin, const uint8_t& resolution, const uint32_t& frequency, const bool& debugStatus) :
+buzzer::buzzer(const int8_t& buzzId, const int8_t& buzzPin, const uint8_t& resolution, const uint32_t& frequency, const bool& debugStatus) :
 buzzId(buzzId),
 buzzPin(buzzPin),
 resolution(resolution),
@@ -47,11 +46,11 @@ void buzzer::initBuzzer()
 {
   //InitBuzzer is for active buzzer
   ledcWriteNote(this->buzzPin, NOTE_E, 4);
-  delay(200);
+  vTaskDelay(200 / portTICK_PERIOD_MS);
   ledcWriteNote(this->buzzPin, NOTE_C, 5);
-  delay(200);
+  vTaskDelay(200 / portTICK_PERIOD_MS);
   ledcWriteNote(this->buzzPin, NOTE_G, 4);
-  delay(200);
+  vTaskDelay(200 / portTICK_PERIOD_MS);
   ledcWriteTone(this->buzzPin, 0);
 
   if(debugStatus) debugln(String(this->buzzId)+": Init Buzzer");
@@ -61,11 +60,11 @@ void buzzer::deinitBuzzer()
 {
   //InitBuzzer is for active buzzer
   ledcWriteNote(this->buzzPin, NOTE_G, 3);
-  delay(200);
+  vTaskDelay(200 / portTICK_PERIOD_MS);
   ledcWriteNote(this->buzzPin, NOTE_E, 3);
-  delay(200);
+  vTaskDelay(200 / portTICK_PERIOD_MS);
   ledcWriteNote(this->buzzPin, NOTE_C, 3);
-  delay(200);
+  vTaskDelay(200 / portTICK_PERIOD_MS);
   ledcWriteTone(this->buzzPin, 0);
 
   if(debugStatus) debugln(String(this->buzzId)+": deInit Buzzer");
@@ -75,7 +74,7 @@ void buzzer::alarm()
 {
   // ledcWriteTone(this->buzzPin, 1000);
   ledcWriteNote(this->buzzPin, NOTE_G, 4);
-  delay(20);
+  vTaskDelay(20 / portTICK_PERIOD_MS);
   ledcWriteTone(this->buzzPin, 0);
 
   if(debugStatus) debugln(String(this->buzzId)+": Alarm");
@@ -87,7 +86,7 @@ void buzzer::nonBlockToneOn()
   if(millis() - buzzMillis > 1000)                               //time this code executes
   {
     ledcWriteTone(this->buzzPin, 1000);
-    delay(100);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
     buzzMillis = millis();  
     ledcWriteTone(this->buzzPin, 0);
   }

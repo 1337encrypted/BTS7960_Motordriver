@@ -8,7 +8,8 @@ class led
 {
   private:
   //ledPin pins for function feedback
-  uint8_t ledPin, resolution;
+  int8_t ledPin;
+  uint8_t resolution;
   uint32_t frequency;
   bool debugStatus;
   String ledId;
@@ -27,9 +28,10 @@ class led
   ledStates ledStatus = ledStates::OFF;
 
   //Function prototypes
-  inline led(const uint8_t& = -1, const uint32_t& = 1000, const uint8_t& = 8, const String& = "LED", const bool& = false) __attribute__((always_inline));
+  inline led(const int8_t& = -1, const uint32_t& = 1000, const uint8_t& = 8, const String& = "LED", const bool& = false) __attribute__((always_inline));
   inline ~led() __attribute__((always_inline));
   inline void begin() __attribute__((always_inline));
+  inline void loop() __attribute__((always_inline));
   inline void on() __attribute__((always_inline));
   inline void off() __attribute__((always_inline));
   inline void toggle() __attribute__((always_inline));
@@ -38,7 +40,7 @@ class led
 };
 
 //parametrized constructor
-led::led(const uint8_t& ledPin, const uint32_t& frequency, const uint8_t& resolution, const String& ledId, const bool& debugStatus) :
+led::led(const int8_t& ledPin, const uint32_t& frequency, const uint8_t& resolution, const String& ledId, const bool& debugStatus) :
 ledPin(ledPin),
 ledId(ledId),
 resolution(resolution),
@@ -52,6 +54,28 @@ void led::begin()
   if(this->debugStatus) Serial.println(this->ledId+" object initilized");
 
   blinkTwice();
+}
+
+void led::loop()
+{
+  switch(this->ledStatus)
+  {
+    case ledStates::ON:
+    on();
+    break;
+
+    case ledStates::OFF:
+    off();
+    break;
+
+    case ledStates::TOGGLE:
+    toggle();
+    break;
+
+    case ledStates::BLINKTWICE:
+    blinkTwice();
+    break;
+  }
 }
 
 void led::on()
@@ -84,20 +108,20 @@ void led::toggle()
 void led:: blinkTwice()
 {
   on();
-  delay(50);
+  vTaskDelay(50 / portTICK_PERIOD_MS);
   off();
-  delay(50);
+  vTaskDelay(50 / portTICK_PERIOD_MS);
   on();
-  delay(50);
+  vTaskDelay(50 / portTICK_PERIOD_MS);
   off();
-  delay(50);
+  vTaskDelay(50 / portTICK_PERIOD_MS);
   if(this->debugStatus) Serial.println(this->ledId+": Blink Twice");
 }
 
 void led::printInfo()
 {
 	if(this->debugStatus) Serial.println(this->ledId+" object initilized");
-	delay(1000);
+	vTaskDelay(1000 / portTICK_PERIOD_MS);
   return;
 }
 

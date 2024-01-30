@@ -15,13 +15,13 @@
 class BTS7960_ESP32
 {
   private:
-  uint8_t R_EN;
-  uint8_t L_EN;
-  uint8_t R_PWM;
-  uint8_t L_PWM;
-  uint8_t R_IS;
-  uint8_t L_IS;
-  uint8_t ID;
+  int8_t R_EN;
+  int8_t L_EN;
+  int8_t R_PWM;
+  int8_t L_PWM;
+  int8_t R_IS;
+  int8_t L_IS;
+  int8_t ID;
   uint8_t resolution;
 
   uint32_t freq;
@@ -56,14 +56,16 @@ class BTS7960_ESP32
     UNFLIP = 'U'
   };
   motorStates motorStatus = motorStates::STOPALL;                        //State variable set to STOP initially
+  motorStates prevMotorStatus = motorStatus;                             //State variable set to STOP initially
   // motorStates ENABLEStatus = motorStates::ENABLE;                     //Motor Enable state
   // motorStates FLIPStatus = motorStates::UNFLIP;                       //Motor FLIP state
 
   
   /*=============================================Function prototyping section=====================================================*/
   inline BTS7960_ESP32();
-  inline BTS7960_ESP32(const uint8_t& = -1, const uint8_t& = -1, const uint8_t& = -1, const uint8_t& = -1, const uint32_t& = 1000, const uint8_t& = 8, const uint8_t& = -1, const uint8_t& = -1, const uint8_t& = -1, const bool& = false); // L_EN, R_EN, L_PWM, R_PWM, L_IS, R_IS, ID
+  inline BTS7960_ESP32(const int8_t& = -1, const int8_t& = -1, const int8_t& = -1, const int8_t& = -1, const uint32_t& = 1000, const uint8_t& = 8, const int8_t& = -1, const int8_t& = -1, const int8_t& = -1, const bool& = false); // L_EN, R_EN, L_PWM, R_PWM, L_IS, R_IS, ID
   inline void begin() __attribute__((always_inline));
+  inline void loop() __attribute__((always_inline));
   inline void enable() __attribute__((always_inline));
   inline void disable() __attribute__((always_inline));
   inline void front() __attribute__((always_inline));
@@ -82,7 +84,7 @@ String BTS7960_ESP32::version="";
 BTS7960_ESP32::BTS7960_ESP32(){}
 
 //Parametrised constructor with 6 parameters (still need to work on it, avoid it for right now)
-BTS7960_ESP32::BTS7960_ESP32(const uint8_t& L_EN, const uint8_t& R_EN, const uint8_t& L_PWM, const uint8_t& R_PWM, const uint32_t& freq, const uint8_t& resolution, const uint8_t& L_IS, const uint8_t& R_IS, const uint8_t& ID, const bool& debugStatus) :
+BTS7960_ESP32::BTS7960_ESP32(const int8_t& L_EN, const int8_t& R_EN, const int8_t& L_PWM, const int8_t& R_PWM, const uint32_t& freq, const uint8_t& resolution, const int8_t& L_IS, const int8_t& R_IS, const int8_t& ID, const bool& debugStatus) :
 L_EN(L_EN),
 R_EN(R_EN),
 L_PWM(L_PWM),              //pin 5 has PWM frequency of 980Hz
@@ -119,6 +121,32 @@ void BTS7960_ESP32::begin()
   ledcAttach(this->R_PWM, this->freq, this->resolution);
 }
 
+void BTS7960_ESP32::loop()
+{
+  switch(this->motorStatus)
+  {
+    case motorStates::FRONT:
+    front();
+    break;
+
+    case motorStates::BACK:
+    back();
+    break;
+
+    case motorStates::ENABLE:
+    enable();
+    break;
+
+    case motorStates::DISABLE:
+    disable();
+    break;
+
+    case motorStates::STOP:
+    stop();
+    break;
+  }
+}
+
 void BTS7960_ESP32::enable()
 {
   //Setting the BTS7960_ESP32 enable pins high
@@ -149,18 +177,38 @@ void BTS7960_ESP32::stop()
 
 void BTS7960_ESP32::front()
 {
-  ledcWrite(this->L_PWM,this->DEFAULTSPEED);
-  ledcWrite(this->R_PWM,this->speed);
-  delayMicroseconds(100);
+  if( this->prevMotorStatus != this->motorStatus )
+  {
+    ledcWrite(this->L_PWM,this->DEFAULTSPEED);
+    delayMicroseconds(50);
+    ledcWrite(this->R_PWM,this->speed);
+
+    this->prevMotorStatus = this->motorStatus;
+  }
+  else
+  {
+    ledcWrite(this->L_PWM,this->DEFAULTSPEED);
+    ledcWrite(this->R_PWM,this->speed);
+  }
   
   if(this->debugStatus) Serial.println("Motor "+(String)ID+" FRONT: "+this->speed);
 }
 
 void BTS7960_ESP32::back()
 {
-  ledcWrite(this->L_PWM,this->speed);
-  ledcWrite(this->R_PWM,this->DEFAULTSPEED);
-  delayMicroseconds(100);
+  if( this->prevMotorStatus != this->motorStatus )
+  {
+    ledcWrite(this->R_PWM,this->DEFAULTSPEED);
+    delayMicroseconds(50);
+    ledcWrite(this->L_PWM,this->speed);
+
+    this->prevMotorStatus = this->motorStatus;
+  }
+  else
+  {
+    ledcWrite(this->R_PWM,this->DEFAULTSPEED);
+    ledcWrite(this->L_PWM,this->speed);
+  }
   
   if(this->debugStatus) Serial.println("Motor "+(String)ID+" BACK: "+this->speed);
 }
