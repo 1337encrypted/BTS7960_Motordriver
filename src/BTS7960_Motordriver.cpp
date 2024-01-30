@@ -19,9 +19,6 @@ debugStatus(debugStatus)
 {
   speed = 70;
   version = "1.0.0";
-  oldMotorSpeed = 70;
-  changeSpeedInc = 60;
-  changeSpeedDec = 50;
 }
 
 void BTS7960_ESP32::begin()
@@ -72,18 +69,38 @@ void BTS7960_ESP32::stop()
 
 void BTS7960_ESP32::front()
 {
-  ledcWrite(this->L_PWM,this->DEFAULTSPEED);
-  ledcWrite(this->R_PWM,this->speed);
-  delayMicroseconds(100);
+  if( this->prevMotorStatus != this->motorStatus )
+  {
+    ledcWrite(this->L_PWM,this->DEFAULTSPEED);
+    delayMicroseconds(50);
+    ledcWrite(this->R_PWM,this->speed);
+
+    this->prevMotorStatus = this->motorStatus;
+  }
+  else
+  {
+    ledcWrite(this->L_PWM,this->DEFAULTSPEED);
+    ledcWrite(this->R_PWM,this->speed);
+  }
   
   if(this->debugStatus) Serial.println("Motor "+(String)ID+" FRONT: "+this->speed);
 }
 
 void BTS7960_ESP32::back()
 {
-  ledcWrite(this->L_PWM,this->speed);
-  ledcWrite(this->R_PWM,this->DEFAULTSPEED);
-  delayMicroseconds(100);
+  if( this->prevMotorStatus != this->motorStatus )
+  {
+    ledcWrite(this->R_PWM,this->DEFAULTSPEED);
+    delayMicroseconds(50);
+    ledcWrite(this->L_PWM,this->speed);
+
+    this->prevMotorStatus = this->motorStatus;
+  }
+  else
+  {
+    ledcWrite(this->R_PWM,this->DEFAULTSPEED);
+    ledcWrite(this->L_PWM,this->speed);
+  }
   
   if(this->debugStatus) Serial.println("Motor "+(String)ID+" BACK: "+this->speed);
 }
