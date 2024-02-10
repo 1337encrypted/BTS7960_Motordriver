@@ -421,16 +421,16 @@ void driveMode::driveMode1()
     blueLed.ledStatus = blueLed.ledStates::OFF;
   }
 
-  if( Ps3.data.analog.button.l1 > 5 )
+  if( Ps3.data.analog.button.r2 > 5 )
   {
-    motor1.speed = motor2.speed = Ps3.data.analog.button.l1;
+    motor1.speed = motor2.speed = Ps3.data.analog.button.r2;
     motor1.motorStatus = motor1.motorStates::FRONT;
     motor2.motorStatus = motor2.motorStates::FRONT;
     redLed.ledStatus = redLed.ledStates::OFF;
     blueLed.ledStatus = blueLed.ledStates::ON;
   }
 
-  if( Ps3.event.button_up.l1 )
+  if( Ps3.event.button_up.r2 )
   {
     motor1.speed = motor2.speed = 0;
     motor1.motorStatus = motor1.motorStates::STOP;
@@ -526,7 +526,7 @@ void driveMode::driveMode1()
 //     blueLed.ledStatus = blueLed.ledStates::OFF;
 //   } 
 }
-
+//
 void driveMode::disconnectedBlink()
 {
   static unsigned long currentTime = millis();
