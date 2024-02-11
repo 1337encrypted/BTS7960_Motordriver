@@ -1,7 +1,7 @@
 #pragma once
 
 /*Cannot create a .cpp file as inline prototypes need the function to be present in the same file as they are defined*/
-#include "CONFIG.h"
+#include "CONFIG.hpp"
 
 class buzzer {
 private:

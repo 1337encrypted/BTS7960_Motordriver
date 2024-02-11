@@ -16,6 +16,8 @@
   #define debug(x) Serial.print(x)
   #define debugln(x) Serial.println(x)
   #define MOTORDEBUG true
+  #define GRIPPERDEBUG true
+  #define CLENCHDEBUG true
   #define LEDDEBUG true
   #define BUZZERDEBUG true
   #define SYSTEMDEBUG true
@@ -23,6 +25,8 @@
   #define debug(x)
   #define debugln(x) 
   #define MOTORDEBUG false
+  #define GRIPPERDEBUG false
+  #define CLENCHDEBUG false
   #define LEDDEBUG false
   #define BUZZERDEBUG false
   #define SYSTEMDEBUG false

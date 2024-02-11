@@ -164,7 +164,6 @@ void BTS7960_ESP32::disable()
   digitalWrite(this->L_EN, LOW);
 
   if(this->debugStatus) Serial.println((String)this->ID+" motor driver disabled");
-  return;
 }
 
 void BTS7960_ESP32::stop()
