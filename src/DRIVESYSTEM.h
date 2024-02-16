@@ -410,16 +410,15 @@ void driveMode::driveMode3()
 }
 
 void driveMode::driveMode1()
-{    
-
-  if( Ps3.event.button_up.r1 )
+{
+  if( Ps3.event.button_up.r2 )
   {
     motor1.speed = motor2.speed = 0;
     motor1.motorStatus = motor1.motorStates::STOP;
     motor2.motorStatus = motor2.motorStates::STOP;
     redLed.ledStatus = redLed.ledStates::ON;
     blueLed.ledStatus = blueLed.ledStates::OFF;
-  }
+  }  
 
   if( Ps3.data.analog.button.r2 > 5 )
   {
@@ -430,14 +429,15 @@ void driveMode::driveMode1()
     blueLed.ledStatus = blueLed.ledStates::ON;
   }
 
-  if( Ps3.event.button_up.r2 )
+  if( Ps3.event.button_up.r1 )
   {
     motor1.speed = motor2.speed = 0;
     motor1.motorStatus = motor1.motorStates::STOP;
     motor2.motorStatus = motor2.motorStates::STOP;
     redLed.ledStatus = redLed.ledStates::ON;
     blueLed.ledStatus = blueLed.ledStates::OFF;
-  }   
+  }
+
   if( Ps3.data.analog.button.r1 > 5)
   {
     motor1.speed = motor2.speed = Ps3.data.analog.button.r1;
